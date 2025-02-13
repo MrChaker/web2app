@@ -10,15 +10,19 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
-        "title": "web-to-app",
+        "label": "main",
+        "url": "https://google.com",
+        "title": "Google",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "visible": false
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; connect-src 'self' https://example.com;"
     }
   },
   "bundle": {
