@@ -9,6 +9,7 @@
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
+
   "app": {
     "withGlobalTauri": true,
     "windows": [
@@ -22,7 +23,8 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://example.com;"
+      "csp": "default-src 'self'; connect-src 'self' https://example.com;",
+      "capabilities": ["appbar", "default"]
     }
   },
   "bundle": {

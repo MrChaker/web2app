@@ -20,11 +20,13 @@ pub fn build_window(app: &mut App) -> WebviewWindow {
         .unwrap(),
     );
 
-    let window_builder = WebviewWindowBuilder::new(app, "google", url)
+    let window_builder = WebviewWindowBuilder::new(app, "app", url)
         .title("")
         .user_agent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15")
         .visible(false)
-        .initialization_script(include_str!("./scripts/download.js"));
+        .decorations(false)
+        .initialization_script(include_str!("./scripts/download.js"))
+        .initialization_script(include_str!("./scripts/app_bar.js"));
 
     window_builder.build().expect("Failed to build window")
 }
