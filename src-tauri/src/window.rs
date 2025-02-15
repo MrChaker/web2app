@@ -1,8 +1,5 @@
 use std::{path::PathBuf, str::FromStr};
-use tauri::{App, Config, Url, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
-
-#[cfg(target_os = "macos")]
-use tauri::{Theme, TitleBarStyle};
+use tauri::{App, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 pub fn data_dir(app_name: String) -> PathBuf {
     PathBuf::from_str(&format!("/Users/mac27/Downloads/{app_name}")).unwrap()
