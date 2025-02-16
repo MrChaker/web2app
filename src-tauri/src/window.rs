@@ -21,6 +21,7 @@ pub fn build_window(app: &mut App) -> WebviewWindow {
         .title("")
         .user_agent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15")
         .visible(false)
+        .inner_size(1200.0, 800.0)
         .decorations(false)
         .initialization_script(include_str!("./scripts/download.js"))
         .initialization_script(include_str!("./scripts/app_bar.js"));

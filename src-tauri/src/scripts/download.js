@@ -21,7 +21,7 @@ function getFilenameFromUrl(url) {
 }
 
 function canDownload(url, anchorElement) {
-  anchorElement.download || isDownloadLink(url);
+  return anchorElement.download || isDownloadLink(url);
 }
 
 function noneHttpLinkDownload(url) {
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let filename = anchorElement.download || getFilenameFromUrl(absoluteUrl);
 
       if (
-        canDownload(absoluteUrl, anchorElement, e) &&
+        canDownload(absoluteUrl, anchorElement) &&
         !noneHttpLinkDownload(absoluteUrl)
       ) {
         e.preventDefault();
