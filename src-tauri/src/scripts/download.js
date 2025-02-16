@@ -77,15 +77,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const absoluteUrl = hrefUrl.href;
       let filename = anchorElement.download || getFilenameFromUrl(absoluteUrl);
 
-      if (
-        canDownload(absoluteUrl, anchorElement) &&
-        !noneHttpLinkDownload(absoluteUrl)
-      ) {
+      if (noneHttpLinkDownload(absoluteUrl)) return;
+      if (canDownload(absoluteUrl, anchorElement)) {
         e.preventDefault();
         invoke("download_file", {
           params: { url: absoluteUrl, filename },
         });
+        return;
       }
+      invoke("try_download_file", {
+        params: { url: absoluteUrl },
+      });
     }
   };
 
