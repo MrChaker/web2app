@@ -1,8 +1,20 @@
 pub fn check_file_or_append(file_path: &str) -> String {
     let mut output_path = file_path.to_string();
     let mut i = 1;
+    let path = std::path::Path::new(file_path);
+    let extension = path.extension().and_then(|ext| ext.to_str()).unwrap_or("");
+    let file_stem = path
+        .file_stem()
+        .and_then(|stem| stem.to_str())
+        .unwrap_or(file_path);
+    let ancestor_path = path.ancestors().nth(1).unwrap().to_str().unwrap();
+
     while std::path::Path::new(&output_path).exists() {
-        output_path = format!("{} ({})", file_path, i);
+        if extension.is_empty() {
+            output_path = format!("{ancestor_path}/{file_stem} ({i})");
+        } else {
+            output_path = format!("{ancestor_path}/{file_stem} ({i}).{extension}");
+        }
         i += 1;
     }
     output_path
