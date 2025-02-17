@@ -1,4 +1,8 @@
-use std::{fs::File, io::copy, str::FromStr};
+use std::{
+    fs::{write, File},
+    io::{copy, Write},
+    str::FromStr,
+};
 use tauri::{command, http::Method, AppHandle, Manager, Url};
 use tauri_plugin_http::reqwest::{ClientBuilder, Request};
 
@@ -43,14 +47,7 @@ pub async fn try_download_file(app: AppHandle, params: DownloadFileParams) {
             .to_string(),
     ) {
         println!("Url did not respond with a file");
-    }
-
-    let total_size = response.content_length().unwrap_or(0);
-    let mut downloaded: u64 = 0;
-
-    while let Some(chunk) = response.chunk().await.unwrap() {
-        downloaded += chunk.len() as u64;
-        println!("Downloaded {} of {} bytes", downloaded, total_size);
+        return;
     }
 
     let output_path = app
@@ -61,6 +58,16 @@ pub async fn try_download_file(app: AppHandle, params: DownloadFileParams) {
     let output_path = check_file_or_append(output_path.to_str().unwrap());
 
     let mut file = File::create(output_path.clone()).unwrap();
-    copy(&mut response.bytes().await.unwrap().as_ref(), &mut file).unwrap();
+    // let bytes = response.bytes().await.unwrap();
+
+    let total_size = response.content_length().unwrap_or(0);
+    let mut downloaded: u64 = 0;
+
+    while let Some(chunk) = response.chunk().await.unwrap() {
+        downloaded += chunk.len() as u64;
+        file.write_all(&chunk).unwrap();
+        println!("Downloaded {} of {} bytes", downloaded, total_size);
+    }
+
     println!("File downloaded to {:?}", output_path);
 }
