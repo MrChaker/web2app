@@ -25,7 +25,7 @@ function canDownload(url, anchorElement) {
 }
 
 function noneHttpLinkDownload(url) {
-  ["blob", "data"].some((protocol) => url.startsWith(protocol));
+  return ["blob", "data"].some((protocol) => url.startsWith(protocol));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -69,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const detectAnchorElementClick = (e) => {
-    e.preventDefault();
     const anchorElement = e.target.closest("a");
 
     if (anchorElement && anchorElement.href) {

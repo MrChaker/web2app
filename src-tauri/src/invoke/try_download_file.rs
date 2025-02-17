@@ -32,11 +32,6 @@ pub async fn try_download_file(app: AppHandle, params: DownloadFileParams) {
         }
     };
 
-    if !response.status().is_success() {
-        println!("Failed to download file: {:?}", response.status());
-        return;
-    }
-
     if !is_file(
         response
             .headers()
@@ -46,7 +41,11 @@ pub async fn try_download_file(app: AppHandle, params: DownloadFileParams) {
             .unwrap_or("")
             .to_string(),
     ) {
-        println!("Url did not respond with a file");
+        return;
+    }
+
+    if !response.status().is_success() {
+        println!("Failed to download file: {:?}", response.status());
         return;
     }
 
