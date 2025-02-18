@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.body.innerHTML = body_content.outerHTML;
     document.body.style.overflow = "hidden";
-    document.body.style.height = "100vh";
+    document.body.style.height = `calc(100vh - ${barHeight}px)`;
 
     const app_bar = document.createElement("div");
     app_bar.id = "appbar";
@@ -105,47 +105,47 @@ document.addEventListener("DOMContentLoaded", () => {
     const style = document.createElement("style");
     style.innerHTML = css;
     document.head.appendChild(style);
+
+    document.getElementById("hide-btn").addEventListener("click", () => {
+      appWindow.minimize();
+    });
+
+    document.getElementById("maximize-btn").addEventListener("click", () => {
+      appWindow.toggleMaximize();
+      document.getElementById("maximize-btn").style.display = "none";
+      document.getElementById("minimize-btn").style.display = "block";
+    });
+
+    document.getElementById("minimize-btn").addEventListener("click", () => {
+      appWindow.toggleMaximize();
+      document.getElementById("minimize-btn").style.display = "none";
+      document.getElementById("maximize-btn").style.display = "block";
+    });
+
+    document.getElementById("close-btn").addEventListener("click", () => {
+      appWindow.close();
+    });
+
+    document.addEventListener("scroll", () => {
+      const elements = document.querySelectorAll("*");
+      elements.forEach((element) => {
+        if (element.id === "appbar") {
+          return;
+        }
+        const computedStyle = window.getComputedStyle(element);
+        const position = computedStyle.position;
+
+        if (position === "fixed" || position === "sticky") {
+          const currentTop = parseFloat(computedStyle.top) || 0;
+          // if (currentTop === "0px") {
+          element.style.top = `${currentTop + barHeight}px !important`;
+          // }
+        }
+      });
+    });
   }
 
   setTimeout(() => {
     create_app_bar();
   }, 10);
-
-  document.getElementById("hide-btn").addEventListener("click", () => {
-    appWindow.minimize();
-  });
-
-  document.getElementById("maximize-btn").addEventListener("click", () => {
-    appWindow.toggleMaximize();
-    document.getElementById("maximize-btn").style.display = "none";
-    document.getElementById("minimize-btn").style.display = "block";
-  });
-
-  document.getElementById("minimize-btn").addEventListener("click", () => {
-    appWindow.toggleMaximize();
-    document.getElementById("minimize-btn").style.display = "none";
-    document.getElementById("maximize-btn").style.display = "block";
-  });
-
-  document.getElementById("close-btn").addEventListener("click", () => {
-    appWindow.close();
-  });
-
-  document.addEventListener("scroll", () => {
-    const elements = document.querySelectorAll("*");
-    elements.forEach((element) => {
-      if (element.id === "appbar") {
-        return;
-      }
-      const computedStyle = window.getComputedStyle(element);
-      const position = computedStyle.position;
-
-      if (position === "fixed" || position === "sticky") {
-        const currentTop = computedStyle.top;
-        if (currentTop === "0px") {
-          element.style.top = `${barHeight}px`;
-        }
-      }
-    });
-  });
 });
