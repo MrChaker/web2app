@@ -16,7 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const tauri = window.__TAURI__;
   const appWindow = tauri.window.getCurrentWindow();
 
-  const app_bar_html = `
+  function create_app_bar() {
+    const app_bar_html = `
     <div class="title"></div>
     <div class="buttons">
       <div class="window-controls">
@@ -33,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   `;
 
-  const css = `
+    const css = `
     #appbar {
       height: ${barHeight}px;
       background: #fefefe;
@@ -81,29 +82,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   `;
 
-  // wrap the body content in a div
-  const body_content = document.createElement("div");
-  body_content.innerHTML = document.body.innerHTML;
-  body_content.style.overflowY = "auto";
-  body_content.style.height = "100%";
+    // wrap the body content in a div
+    const body_content = document.createElement("div");
+    body_content.innerHTML = document.body.innerHTML;
+    body_content.style.overflowY = "auto";
+    body_content.style.height = "100%";
 
-  document.body.innerHTML = body_content.outerHTML;
-  document.body.style.overflow = "hidden";
-  document.body.style.height = "100vh";
+    document.body.innerHTML = body_content.outerHTML;
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100vh";
 
-  const app_bar = document.createElement("div");
-  app_bar.id = "appbar";
-  app_bar.innerHTML = app_bar_html;
-  app_bar.setAttribute("data-tauri-drag-region", "");
-  document.body.prepend(app_bar);
+    const app_bar = document.createElement("div");
+    app_bar.id = "appbar";
+    app_bar.innerHTML = app_bar_html;
+    app_bar.setAttribute("data-tauri-drag-region", "");
+    document.body.prepend(app_bar);
 
-  const spacer = document.createElement("div");
-  spacer.id = "spacer";
-  document.body.prepend(spacer);
+    const spacer = document.createElement("div");
+    spacer.id = "spacer";
+    document.body.prepend(spacer);
 
-  const style = document.createElement("style");
-  style.innerHTML = css;
-  document.head.appendChild(style);
+    const style = document.createElement("style");
+    style.innerHTML = css;
+    document.head.appendChild(style);
+  }
+
+  setTimeout(() => {
+    create_app_bar();
+  }, 10);
 
   document.getElementById("hide-btn").addEventListener("click", () => {
     appWindow.minimize();
