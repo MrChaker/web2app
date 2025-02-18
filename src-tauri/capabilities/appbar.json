@@ -4,7 +4,7 @@
   "description": "Capability for the appbar window",
   "windows": ["app"],
   "remote": {
-    "urls": ["http://127.0.0.1:5500/"]
+    "urls": ["https://*.*", "http://*.*"]
   },
   "permissions": [
     "core:default",
@@ -13,6 +13,7 @@
     "core:window:allow-start-dragging",
     "core:window:allow-toggle-maximize",
     "core:window:allow-minimize",
-    "core:window:allow-close"
+    "core:window:allow-close",
+    "core:event:allow-listen"
   ]
 }

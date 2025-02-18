@@ -30,7 +30,7 @@ function noneHttpLinkDownload(url) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const tauri = window.__TAURI__;
-  // const appWindow = tauri.window.getCurrentWindow();
+  const appWindow = tauri.window.getCurrentWindow();
   const invoke = tauri.core.invoke;
 
   function downloadFromDataUri(dataURI, filename) {
@@ -77,8 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
       let filename = anchorElement.download || getFilenameFromUrl(absoluteUrl);
 
       if (noneHttpLinkDownload(absoluteUrl)) return;
+
+      e.preventDefault();
       if (canDownload(absoluteUrl, anchorElement)) {
-        e.preventDefault();
         invoke("download_file", {
           params: { url: absoluteUrl, filename },
         });
@@ -119,4 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("click", detectAnchorElementClick, true);
   handleDownloadsTriggeredByCreatingHref();
+
+  console.log(appWindow, appWindow?.listen);
+  appWindow.listen("link-not-downloadable", (event) => {
+    console.log(event);
+    const { url } = event.payload;
+    location.assign(url);
+  });
 });
