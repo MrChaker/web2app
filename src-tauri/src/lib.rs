@@ -12,8 +12,7 @@ use window::build_window;
 pub fn run() {
     let app = tauri::Builder::default();
 
-    app
-        // .plugin(tauri_plugin_prevent_default::init())
+    app.plugin(tauri_plugin_prevent_default::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_http::init())
         .invoke_handler(tauri::generate_handler![

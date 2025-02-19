@@ -86,11 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const body_content = document.createElement("div");
     body_content.innerHTML = document.body.innerHTML;
     body_content.style.overflowY = "auto";
-    body_content.style.height = "100%";
+    body_content.style.height = `calc(100vh - ${barHeight}px)`;
+    body_content.style.position = `relative`;
 
     document.body.innerHTML = body_content.outerHTML;
     document.body.style.overflow = "hidden";
-    document.body.style.height = `calc(100vh - ${barHeight}px)`;
 
     const app_bar = document.createElement("div");
     app_bar.id = "appbar";
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
       appWindow.close();
     });
 
-    document.addEventListener("scroll", () => {
+    function changeFixedElements() {
       const elements = document.querySelectorAll("*");
       elements.forEach((element) => {
         if (element.id === "appbar") {
@@ -137,15 +137,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (position === "fixed" || position === "sticky") {
           const currentTop = parseFloat(computedStyle.top) || 0;
-          // if (currentTop === "0px") {
           element.style.top = `${currentTop + barHeight}px !important`;
-          // }
         }
       });
-    });
+    }
+
+    changeFixedElements();
+    document.addEventListener("wheel", changeFixedElements);
+
+    setInterval(() => {
+      // make sure body overflow is hidden
+      document.body.style.overflow = "hidden";
+      changeFixedElements();
+    }, 200);
   }
 
   setTimeout(() => {
     create_app_bar();
-  }, 10);
+  }, 100);
 });
