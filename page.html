@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Black Image Blob Generator</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+
+      .download-btn {
+        padding: 10px 20px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 16px;
+      }
+
+      .download-btn:hover {
+        background-color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="download-btn" onclick="generateBlackImage()">
+      Download Black Image (Blob)
+    </button>
+
+    <script>
+      function generateBlackImage() {
+        // Base64 encoded 1x1 black PNG
+        const base64Data =
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+
+        // Convert base64 to raw binary data
+        const byteCharacters = atob(base64Data);
+        const byteArrays = [];
+
+        for (let offset = 0; offset < byteCharacters.length; offset++) {
+          const byte = byteCharacters.charCodeAt(offset);
+          byteArrays.push(byte);
+        }
+
+        // Create blob from binary data
+        const blob = new Blob([new Uint8Array(byteArrays)], {
+          type: "image/png",
+        });
+
+        // Create temporary link and trigger download
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "black-image.png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    </script>
+
+    <div style="max-width: 600px; margin-top: 30px; color: #666">
+      <p><strong>Features:</strong></p>
+      <ul>
+        <li>Generates 1x1 pixel black PNG image entirely in memory</li>
+        <li>No server requests needed</li>
+        <li>File size only 67 bytes</li>
+        <li>Works offline</li>
+        <li>No external dependencies</li>
+      </ul>
+    </div>
+  </body>
+</html>
