@@ -16,6 +16,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   window.db = db;
   createDownloadsList();
+  // when launching all download that were in progress before closing the app should now be canceled
+  await cancel_all_downloads_in_progress_state(db);
 
   webview.listen("download-started", async (event) => {
     let id = await addDownload(db, event.payload);
@@ -222,4 +224,12 @@ const getDownloads = async (database) => {
   );
 
   return downloads;
+};
+
+const cancel_all_downloads_in_progress_state = async (database) => {
+  const result = await database.execute(
+    "UPDATE downloads SET state = $1 WHERE state = $2",
+    [states.canceled, states.in_progress]
+  );
+  return result;
 };

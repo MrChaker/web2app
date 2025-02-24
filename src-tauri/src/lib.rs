@@ -34,8 +34,8 @@ pub fn run() {
         .setup(move |app| {
             app.manage(Mutex::new(AppState::default()));
             tauri::async_runtime::block_on(async move {
-                let window = build_window(app);
-                window.await.show().unwrap();
+                let window = build_window(app).await;
+                window.show().unwrap();
             });
             Ok(())
         })
