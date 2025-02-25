@@ -120,7 +120,6 @@ const createDownloadRow = (download) => {
     switch (download.state) {
       case states.in_progress:
         return `
-        <button id="pause-btn" data-id="${download.id}" >${window.icons.pause}</button>
         <button id="cancel" data-id="${download.id}" >${window.icons.cancel}</button>
         `;
       case states.canceled:
@@ -170,7 +169,7 @@ const createDownloadRow = (download) => {
     });
 
   downloadDiv
-    .querySelector("#pause-btn")
+    .querySelector("#cancel")
     ?.addEventListener("click", async (event) => {
       invoke("cancel_download", { params: { id: String(download.id) } });
       await updateDownload(window.db, {
