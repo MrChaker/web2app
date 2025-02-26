@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tauri = window.__TAURI__;
   const invoke = tauri.core.invoke;
   const webview = tauri.window.getCurrentWindow();
-  const db = await tauri.sql.load("sqlite:test.db").catch((err) => {
+  const db = await tauri.sql.load("sqlite:test-encryption.db").catch((err) => {
     console.error(err);
   });
   window.db = db;
