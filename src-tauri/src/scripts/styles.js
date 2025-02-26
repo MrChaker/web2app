@@ -40,11 +40,13 @@ const css = `
       background: #eaeaea;
     }
 
-    #downloads-manager {
+    #downloads-manager,
+    #settings-manager {
       position: relative;
     }
 
-     #downloads-window {
+     #downloads-window, 
+     #settings-window {
       position: absolute;
       top: 100%;
       right: 0;
@@ -57,11 +59,12 @@ const css = `
       color: rgb(80, 80, 80);
     }
 
-    #downloads-window h3 {
+    #downloads-window h3,
+    #settings-window h3 {
       padding: 0 1.5rem 1rem;
       margin: 0;
       border-bottom: 1px solid rgb(232, 232, 232);
-
+      font-size: 0.9rem;
     }
 
     #download-list {

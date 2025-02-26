@@ -1,50 +1,87 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import {
+  getLicense,
+  getLicenseKey,
+  KeygenError,
+  KeygenLicense,
+  validateKey,
+} from "tauri-plugin-keygen-api";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  // license validation logic
+  const params = new URLSearchParams(location.search);
+  const cachedKey = params.get("cachedKey");
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  const [key, setKey] = useState(cachedKey || "");
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+
+  const beforeLoad = async () => {
+    let license = await getLicense();
+    let licenseKey = await getLicenseKey();
+
+    console.log(license);
+    if (license === null) {
+      setKey(licenseKey || "");
+    } else {
+      invoke("build_window", {
+        params: {
+          expiry: license.expiry,
+          key: license.key,
+        },
+      });
+    }
+  };
+  useEffect(() => {
+    beforeLoad();
+  }, []);
+
+  const validate = async () => {
+    setErr("");
+    setLoading(true);
+
+    let license: KeygenLicense;
+
+    // validate license key
+    try {
+      license = await validateKey({ key });
+    } catch (e) {
+      const { code, detail } = e as KeygenError;
+      setErr(`${code}: ${detail}`);
+      setLoading(false);
+      return;
+    }
+
+    // check license
+    if (license.valid) {
+      invoke("build_window", {
+        params: {
+          expiry: license.expiry,
+          key: license.key,
+        },
+      });
+    } else {
+      setErr(`${license.code}: ${license.detail}`);
+    }
+
+    setLoading(false);
+  };
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <div className="form">
+      <label htmlFor="license-key">License Key</label>
+      <input
+        autoFocus
+        id="license-key"
+        value={key}
+        onChange={(e) => setKey(e.target.value)}
+      />
+      <button onClick={validate}>Validate</button>
+      {loading && <div>validating license...</div>}
+      {err !== "" && <div style={{ color: "#ef0222" }}>{err}</div>}
+    </div>
   );
 }
 

@@ -12,7 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <div id="downloads-manager">
           <button id="download-btn">${window.icons.download}</button>
         </div>
-        <button id="settings-btn">${window.icons.settings}</button>
+         <div id="settings-manager">
+          <button id="settings-btn">${window.icons.settings}</button>
+        </div>
       </div>
       <div class="window-controls">
         <button id="hide-btn">${window.icons.hide}</button>
@@ -68,6 +70,12 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("downloads-window").style.display =
         display === "block" ? "none" : "block";
       window.dispatchUpdate();
+    });
+
+    document.getElementById("settings-btn").addEventListener("click", () => {
+      const display = document.getElementById("settings-window").style.display;
+      document.getElementById("settings-window").style.display =
+        display === "block" ? "none" : "block";
     });
 
     document.getElementById("close-btn").addEventListener("click", () => {

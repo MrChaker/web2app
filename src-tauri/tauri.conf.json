@@ -14,12 +14,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "label": "main",
-        "url": "https://google.com",
-        "title": "Google",
-        "width": 800,
-        "height": 600,
-        "visible": false
+        "label": "main"
       }
     ],
     "security": {

@@ -27,6 +27,7 @@ tauri-plugin-http = "2.2.0"
 sqlx = { version = "0.8", features = [ "runtime-async-std" ] }
 async-std =  { version = "1.10", features = [ "attributes" ] }
 tauri-plugin-shell = "2.2.0"
+tauri-plugin-keygen = { git = "https://github.com/bagindo/tauri-plugin-keygen", branch = "v2" }
 
 [dependencies.tauri-plugin-sql]
 features = ["sqlite"]
