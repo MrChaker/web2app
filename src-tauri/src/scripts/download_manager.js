@@ -39,6 +39,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     dispatchUpdate();
   });
 
+  webview.listen("download-success", async (event) => {
+    await updateDownload(db, {
+      id: event.payload.id,
+      state: states.finished,
+    });
+    dispatchUpdate();
+  });
+
+  webview.listen("download-failed", async (event) => {
+    await updateDownload(db, {
+      id: event.payload.id,
+      state: states.failed,
+    });
+    dispatchUpdate();
+  });
+
   // called whenever there is an update to db
   document.addEventListener("update-downloads", async (event) => {
     const downloads = await getDownloads(db);
