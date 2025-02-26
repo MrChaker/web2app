@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tauri = window.__TAURI__;
   const invoke = tauri.core.invoke;
   const webview = tauri.window.getCurrentWindow();
-  const db = await tauri.sql.load("sqlite:test.db").catch((err) => {
+  const db = await tauri.sql.load("sqlite:test-encryption.db").catch((err) => {
     console.error(err);
   });
   window.db = db;
@@ -36,6 +36,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   webview.listen("download-progress", async (event) => {
     await updateDownload(db, { ...event.payload, state: states.in_progress });
+    dispatchUpdate();
+  });
+
+  webview.listen("download-success", async (event) => {
+    await updateDownload(db, {
+      id: event.payload.id,
+      state: states.finished,
+    });
+    dispatchUpdate();
+  });
+
+  webview.listen("download-failed", async (event) => {
+    await updateDownload(db, {
+      id: event.payload.id,
+      state: states.failed,
+    });
     dispatchUpdate();
   });
 

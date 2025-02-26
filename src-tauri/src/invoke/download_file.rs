@@ -65,7 +65,7 @@ pub async fn download_file(app: AppHandle, params: DownloadFileParams) {
         if state.canceled_downloads.contains(&params.id) {
             println!("Download canceled");
             std::fs::remove_file(params.output_path).unwrap();
-            break;
+            return;
         }
 
         downloaded += chunk.len() as u64;

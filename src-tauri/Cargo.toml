@@ -28,7 +28,10 @@ sqlx = { version = "0.8", features = [ "runtime-async-std" ] }
 async-std =  { version = "1.10", features = [ "attributes" ] }
 tauri-plugin-shell = "2.2.0"
 tauri-plugin-keygen = { git = "https://github.com/bagindo/tauri-plugin-keygen", branch = "v2" }
+dotenv = "0.15"
 
 [dependencies.tauri-plugin-sql]
-features = ["sqlite"]
-version = "2.0.0-rc"
+features = ["bundled-sqlcipher"]
+version =  "2.0.0-rc.0"
+git = "https://github.com/eleroy/plugins-workspace"
+branch = "sql/sqlcipher"

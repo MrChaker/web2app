@@ -84,6 +84,7 @@ const css = `
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 2rem;
     }
     .file-row:hover {
       background-color: #f5f5f5;
