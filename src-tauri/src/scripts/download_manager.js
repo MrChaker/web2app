@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await cancel_all_downloads_in_progress_state(db);
 
   webview.listen("download-started", async (event) => {
+    document.getElementById("downloads-window").style.display = "block";
     let id = await addDownload(db, event.payload);
     dispatchUpdate();
 
@@ -31,7 +32,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         output_path: event.payload.output_path,
       },
     });
-    document.getElementById("downloads-window").style.display = "block";
   });
 
   webview.listen("download-progress", async (event) => {
