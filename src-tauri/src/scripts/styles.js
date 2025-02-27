@@ -1,4 +1,5 @@
 const css = `
+
     #appbar {
       background: #fefefe;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -71,6 +72,9 @@ const css = `
       max-height: 328px;
       overflow-y: auto;
     }
+    #settings-list {
+      padding: 1rem 1.5rem;
+    }
 
     .file-row {
       padding: 1rem 1.5rem;
@@ -120,6 +124,18 @@ const css = `
       background-color: #aeaeae;
       height: 100%;
     }
+
+    #deactivateBtn {
+      background-color: #FF0214;
+      color: white;
+      font-weight: bold;
+      padding: .5rem 1rem;
+      border-radius: 1rem;
+      cursor: pointer;
+      text-wrap: nowrap;
+      margin-top: 0.5rem;
+    }
+    
   `;
 
 document.addEventListener("DOMContentLoaded", () => {

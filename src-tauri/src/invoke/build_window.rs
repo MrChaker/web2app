@@ -37,15 +37,6 @@ pub fn build_window(app: AppHandle, params: Params) {
         .visible(false)
         .inner_size(1200.0, 800.0)
         .decorations(false)
-        .initialization_script(&format!(
-            "
-            window.license = {{
-                key: {},
-                expiry, {}
-            }};
-        ",
-            params.key, params.expiry
-        ))
         .initialization_script(include_str!("../scripts/icons.js"))
         .initialization_script(include_str!("../scripts/helpers.js"))
         .initialization_script(include_str!("../scripts/styles.js"))

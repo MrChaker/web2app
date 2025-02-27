@@ -2,18 +2,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tauri = window.__TAURI__;
   const invoke = tauri.core.invoke;
   const webview = tauri.window.getCurrentWindow();
-  const db = await tauri.sql.load("sqlite:test.db").catch((err) => {
-    console.error(err);
-  });
+  const license = await getLicense(invoke);
+  const expiryEl = document.createElement("div");
+  console.log(license);
+  expiryEl.innerText = `License Expires in: ${license?.expiry || "-"}`;
 
-  const deactivateBtn = document.createElement("button");
+  const deactivateBtn = document.createElement("div");
+  deactivateBtn.id = "deactivateBtn";
   deactivateBtn.innerHTML = "De-activate license";
   deactivateBtn.addEventListener("click", async () => {
     await resetLicense(invoke);
   });
 
   setTimeout(() => {
-    document.getElementById("settings-window")?.append(deactivateBtn);
+    document.getElementById("settings-list")?.append(expiryEl);
+    document.getElementById("settings-list")?.append(deactivateBtn);
   }, 200);
 });
 
@@ -36,6 +39,11 @@ class KeygenError extends Error {
     this.code = code;
     this.detail = detail;
   }
+}
+
+async function getLicense(invoke) {
+  const res = await invoke("plugin:keygen|get_license");
+  return res;
 }
 
 async function resetLicense(invoke) {

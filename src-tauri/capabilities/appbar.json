@@ -20,6 +20,7 @@
     "sql:allow-select",
     "shell:allow-open",
     "shell:default",
-    "keygen:allow-reset-license"
+    "keygen:allow-reset-license",
+    "keygen:allow-get-license"
   ]
 }
