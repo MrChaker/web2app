@@ -136,13 +136,10 @@ const createDownloadRow = (download) => {
     switch (download.state) {
       case states.in_progress:
         return `
-         <button id="file-location" data-output-path="${download.output_path}" >${window.icons.folder}</button>
         <button id="cancel" data-id="${download.id}" >${window.icons.cancel}</button>
         `;
       case states.canceled:
-        return `
-          <button id="file-location" data-output-path="${download.output_path}" >${window.icons.folder}</button>
-        <p>Canceled</p>`;
+        return `<p>Canceled</p>`;
       case states.failed:
         return "<p>Failed</p>";
       default:
