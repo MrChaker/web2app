@@ -136,10 +136,13 @@ const createDownloadRow = (download) => {
     switch (download.state) {
       case states.in_progress:
         return `
+         <button id="file-location" data-output-path="${download.output_path}" >${window.icons.folder}</button>
         <button id="cancel" data-id="${download.id}" >${window.icons.cancel}</button>
         `;
       case states.canceled:
-        return "<p>Canceled</p>";
+        return `
+          <button id="file-location" data-output-path="${download.output_path}" >${window.icons.folder}</button>
+        <p>Canceled</p>`;
       case states.failed:
         return "<p>Failed</p>";
       default:
@@ -181,7 +184,10 @@ const createDownloadRow = (download) => {
     .querySelector("#file-location")
     ?.addEventListener("click", (event) => {
       const outputPath = event.currentTarget.getAttribute("data-output-path");
-      window.__TAURI__.shell.open(outputPath.split("/").slice(0, -1).join("/"));
+      let os_seperator = outputPath.includes("\\") ? "\\" : "/";
+      let splits = outputPath.split(os_seperator);
+      splits.pop();
+      window.__TAURI__.shell.open(splits.join(os_seperator));
     });
 
   downloadDiv
