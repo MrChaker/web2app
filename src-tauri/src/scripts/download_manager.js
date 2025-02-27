@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await cancel_all_downloads_in_progress_state(db);
 
   webview.listen("download-started", async (event) => {
+    document.getElementById("downloads-window").style.display = "block";
     let id = await addDownload(db, event.payload);
     dispatchUpdate();
 
@@ -31,7 +32,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         output_path: event.payload.output_path,
       },
     });
-    document.getElementById("downloads-window").style.display = "block";
   });
 
   webview.listen("download-progress", async (event) => {
@@ -139,7 +139,7 @@ const createDownloadRow = (download) => {
         <button id="cancel" data-id="${download.id}" >${window.icons.cancel}</button>
         `;
       case states.canceled:
-        return "<p>Canceled</p>";
+        return `<p>Canceled</p>`;
       case states.failed:
         return "<p>Failed</p>";
       default:
@@ -181,7 +181,10 @@ const createDownloadRow = (download) => {
     .querySelector("#file-location")
     ?.addEventListener("click", (event) => {
       const outputPath = event.currentTarget.getAttribute("data-output-path");
-      window.__TAURI__.shell.open(outputPath.split("/").slice(0, -1).join("/"));
+      let os_seperator = outputPath.includes("\\") ? "\\" : "/";
+      let splits = outputPath.split(os_seperator);
+      splits.pop();
+      window.__TAURI__.shell.open(splits.join(os_seperator));
     });
 
   downloadDiv

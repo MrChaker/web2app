@@ -44,7 +44,7 @@ impl DownloadService {
             DownloadPayload {
                 url: url.to_string(),
                 output_path: output_path.clone(),
-                file_name: get_filename_from_url(url.to_string()),
+                file_name: get_filename_from_url(output_path),
                 file_size: 0,
                 progress: 0,
             },
