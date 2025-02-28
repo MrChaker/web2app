@@ -11,15 +11,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tauri = window.__TAURI__;
   const invoke = tauri.core.invoke;
   const webview = tauri.window.getCurrentWindow();
-  const db = await tauri.sql.load("sqlite:test-encryption.db").catch((err) => {
-    console.error(err);
-  });
+
+  const db = await tauri.sql
+    .load("sqlite:test-encryption.db", window.config.db_key)
+    .catch((err) => {
+      console.error(err);
+    });
   window.db = db;
+
   createDownloadsList();
   // when launching all download that were in progress before closing the app should now be canceled
   await cancel_all_downloads_in_progress_state(db);
 
   webview.listen("download-started", async (event) => {
+    console.log(event.payload);
+
     document.getElementById("downloads-window").style.display = "block";
     let id = await addDownload(db, event.payload);
     dispatchUpdate();
@@ -41,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   webview.listen("download-success", async (event) => {
     await updateDownload(db, {
-      id: event.payload.id,
+      ...event.payload,
       state: states.finished,
     });
     dispatchUpdate();
@@ -49,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   webview.listen("download-failed", async (event) => {
     await updateDownload(db, {
-      id: event.payload.id,
+      ...event.payload,
       state: states.failed,
     });
     dispatchUpdate();
@@ -240,7 +246,6 @@ const getDownloads = async (database) => {
   const downloads = await database.select(
     "SELECT * FROM downloads ORDER BY created_at DESC"
   );
-
   return downloads;
 };
 

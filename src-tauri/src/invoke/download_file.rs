@@ -25,6 +25,7 @@ struct DownloadProgressPayload {
 #[derive(serde::Serialize, Clone)]
 struct DownloadEndPayload {
     id: String,
+    file_size: u64,
 }
 
 #[command]
@@ -48,6 +49,7 @@ pub async fn download_file(app: AppHandle, params: DownloadFileParams) {
                 "download-failed",
                 DownloadEndPayload {
                     id: params.id.clone(),
+                    file_size: 0,
                 },
             );
             return;
@@ -89,6 +91,7 @@ pub async fn download_file(app: AppHandle, params: DownloadFileParams) {
             "download-success",
             DownloadEndPayload {
                 id: params.id.clone(),
+                file_size: total_size,
             },
         );
     } else {
@@ -97,6 +100,7 @@ pub async fn download_file(app: AppHandle, params: DownloadFileParams) {
             "download-failed",
             DownloadEndPayload {
                 id: params.id.clone(),
+                file_size: total_size,
             },
         );
     }

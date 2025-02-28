@@ -4863,7 +4863,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-sql"
 version = "2.0.0-rc.0"
-source = "git+https://github.com/eleroy/plugins-workspace?branch=sql/sqlcipher#62b013a7733baf4ca5e1e9b8b01a0fb4749aa56c"
+source = "git+https://github.com/MrChaker/plugins-workspace?branch=sql/sqlcipher-load-with-key#995bb3679b2da74c4603bef7416df26ce8b735d1"
 dependencies = [
  "futures-core",
  "indexmap 2.7.1",
