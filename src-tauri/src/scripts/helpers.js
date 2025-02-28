@@ -21,6 +21,16 @@ const durationPastFromDate = (date) => {
   }
 };
 
+const formatTimeStringToDate = (time) => {
+  const date = new Date(time);
+  const formattedDate = `${date.getDate().toString().padStart(2, "0")}-${(
+    date.getMonth() + 1
+  )
+    .toString()
+    .padStart(2, "0")}-${date.getFullYear()}`;
+  return formattedDate;
+};
+
 const formatFileSize = (size) => {
   if (size < 1024) {
     return `${size} B`;
@@ -35,3 +45,4 @@ const formatFileSize = (size) => {
 
 window.formatFileSize = formatFileSize;
 window.durationPastFromDate = durationPastFromDate;
+window.formatTimeStringToDate = formatTimeStringToDate;

@@ -3,20 +3,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   const invoke = tauri.core.invoke;
   const webview = tauri.window.getCurrentWindow();
   const license = await getLicense(invoke);
-  const expiryEl = document.createElement("div");
-  console.log(license);
-  expiryEl.innerText = `License Expires in: ${license?.expiry || "-"}`;
 
-  const deactivateBtn = document.createElement("div");
-  deactivateBtn.id = "deactivateBtn";
-  deactivateBtn.innerHTML = "De-activate license";
-  deactivateBtn.addEventListener("click", async () => {
-    await resetLicense(invoke);
-  });
+  let html = `
+    <h4 style="text-align: center; margin: 1rem 0;">-- License --</h4>
+    <p><span style="font-weight: bold">Status:<span> ${
+      license.valid ? "🟢" : "🔴"
+    }</p>
+    <p><span style="font-weight: bold">Valid Until:<span> ${
+      window.formatTimeStringToDate(license?.expiry) || "-"
+    }</p>
+    <div id="deactivateBtn">De-activate license</div>
+  `;
+  const parent = document.createElement("div");
+  parent.innerHTML = html;
 
   setTimeout(() => {
-    document.getElementById("settings-list")?.append(expiryEl);
-    document.getElementById("settings-list")?.append(deactivateBtn);
+    document.getElementById("settings-list")?.append(parent);
+    document
+      .getElementById("deactivateBtn")
+      .addEventListener("click", async () => {
+        // await resetLicense(invoke);
+        // console.log(await tauri.webview.getAllWebviews());
+        invoke("show_app_window");
+      });
   }, 200);
 });
 
