@@ -33,5 +33,23 @@ const formatFileSize = (size) => {
   }
 };
 
+function getParentDirectory(path) {
+  let normalizedPath = path.replace(/\\/g, "/");
+
+  normalizedPath = normalizedPath.replace(/\/+$/, "");
+
+  let splits = normalizedPath.split("/");
+
+  splits.pop();
+
+  let parentPath = splits.join("/");
+  if (navigator.platform.includes("Win")) {
+    parentPath = parentPath.replace(/\//g, "\\");
+  }
+
+  return parentPath;
+}
+
 window.formatFileSize = formatFileSize;
 window.durationPastFromDate = durationPastFromDate;
+window.getParentDirectory = getParentDirectory;

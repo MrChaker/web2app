@@ -179,7 +179,8 @@ const createDownloadRow = (download) => {
 
   downloadDiv.querySelector("#info")?.addEventListener("click", (event) => {
     const outputPath = event.currentTarget.getAttribute("data-output-path");
-    if (download.status === states.finished)
+
+    if (download.state === states.finished)
       window.__TAURI__.shell.open(outputPath);
   });
 
@@ -187,10 +188,7 @@ const createDownloadRow = (download) => {
     .querySelector("#file-location")
     ?.addEventListener("click", (event) => {
       const outputPath = event.currentTarget.getAttribute("data-output-path");
-      let os_seperator = outputPath.includes("\\") ? "\\" : "/";
-      let splits = outputPath.split(os_seperator);
-      splits.pop();
-      window.__TAURI__.shell.open(splits.join(os_seperator));
+      window.__TAURI__.shell.open(window.getParentDirectory(outputPath));
     });
 
   downloadDiv
