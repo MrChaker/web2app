@@ -19,6 +19,9 @@ import { invoke } from "@tauri-apps/api/core";
 const AppBar = () => {
   const appWindow = getCurrentWindow();
   const barHeight = 38;
+  const barHeightPhysical = navigator.platform.toLowerCase().includes("win")
+    ? barHeight + 8
+    : barHeight * 2;
   const [isMaximized, setIsMaximized] = useState(false);
 
   const checkMaximized = async () => {
@@ -34,10 +37,19 @@ const AppBar = () => {
       const app_window = windows.find((w) => w.label == "app");
 
       app_window?.setPosition(
-        new PhysicalPosition(pos.x, pos.y + barHeight * 2)
+        new PhysicalPosition(pos.x, pos.y + barHeightPhysical)
       );
       app_window?.setSize(
-        new PhysicalSize(size.width, size.height - barHeight * 2)
+        new PhysicalSize(size.width, size.height - barHeightPhysical)
+      );
+    });
+
+    appWindow.onMoved(async ({ payload: position }) => {
+      const windows = await getAllWindows();
+      const app_window = windows.find((w) => w.label == "app");
+
+      app_window?.setPosition(
+        new PhysicalPosition(position.x, position.y + barHeightPhysical)
       );
     });
 
@@ -53,7 +65,8 @@ const AppBar = () => {
     <div
       id="appbar"
       style={{ height: barHeight }}
-      data-tauri-drag-region={true}>
+      data-tauri-drag-region={true}
+    >
       <div className="title"></div>
       <div className="buttons">
         <div className="window-controls">
@@ -65,7 +78,8 @@ const AppBar = () => {
                   .emitTo("app", "show_download_window")
                   .then(() => console.log("done"))
                   .catch((err) => console.log(err));
-              }}>
+              }}
+            >
               <DownloadIcon />
             </button>
           </div>
@@ -81,7 +95,8 @@ const AppBar = () => {
             onClick={() => {
               appWindow.toggleMaximize();
               setIsMaximized((prev) => !prev);
-            }}>
+            }}
+          >
             {isMaximized ? <Minimize /> : <Maximize />}
           </button>
 
