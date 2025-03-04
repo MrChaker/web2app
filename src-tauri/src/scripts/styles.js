@@ -11,6 +11,7 @@ const css = `
       background-color: white;
       font-size: 0.8rem;
       color: rgb(80, 80, 80);
+      z-index: 99999;
     }
 
     #downloads-window h3 {
@@ -58,8 +59,17 @@ const css = `
       margin: 0;
       color: #666;
     }
-    .actions button:hover {
+
+    .actions button {
       border-radius: 100%;
+      border: 1px solid #f5f5f5;
+      display: flex;
+      padding: 8px;
+      background-color: #fff;
+    }
+
+    .actions button:hover {
+      background-color: rgb(192, 192, 192);
     }
 
     .progress-bar {
