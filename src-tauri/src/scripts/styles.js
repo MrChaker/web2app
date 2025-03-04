@@ -1,52 +1,8 @@
 const css = `
-    #appbar {
-      background: #fefefe;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 10px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      user-select: none;
-      z-index: 99999999;
-    }
-
-    #appbar .buttons {
-      display: flex;
-      gap: 40px;
-    }
-
-    #appbar .window-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    #appbar button {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #appbar button:hover {
-      background: #eaeaea;
-    }
-
-    #downloads-manager {
-      position: relative;
-    }
 
      #downloads-window {
-      position: absolute;
-      top: 100%;
+      position: fixed;
+      top: 0;
       right: 0;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 1rem;

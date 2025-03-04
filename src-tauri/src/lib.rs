@@ -12,7 +12,6 @@ use migrations::get_migrations;
 use std::env;
 use std::sync::Mutex;
 use tauri::Manager;
-use tauri_plugin_sql::SqliteConnectOptions;
 use window::build_window;
 #[derive(Default)]
 pub struct AppState {
@@ -37,15 +36,15 @@ pub fn run() {
         .setup(move |app| {
             app.manage(Mutex::new(AppState::default()));
             tauri::async_runtime::block_on(async move {
-                let window = build_window(app).await;
-                window.show().unwrap();
+                let windows = build_window(app).await;
+                windows.iter().for_each(|window| window.show().unwrap());
             });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             download_file,
             download_binary_file,
-            cancel_download
+            cancel_download,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
