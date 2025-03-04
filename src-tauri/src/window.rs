@@ -1,8 +1,11 @@
 use crate::download_manager::download_service::DownloadService;
 use std::{env, path::PathBuf, str::FromStr};
-use tauri::{webview::DownloadEvent, App, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
+use tauri::{
+    webview::DownloadEvent, App, LogicalPosition, LogicalSize, WebviewUrl, WebviewWindow,
+    WebviewWindowBuilder, Window,
+};
 
-pub async fn build_window(app: &mut App) -> Vec<WebviewWindow> {
+pub async fn build_window(app: &mut App) -> Window {
     // let package_name = "Google".to_string();
 
     let url = WebviewUrl::App(PathBuf::from_str("https://desktop.github.com/download/").unwrap());
@@ -28,50 +31,47 @@ pub async fn build_window(app: &mut App) -> Vec<WebviewWindow> {
         db_key,
     );
 
-    let container_height = 600.0;
-    let container_top = 100.0;
+    let width = 1200.;
+    let height = 800.;
     let app_bar_height = 38.0;
-
-    // app bar window
-    //
     let app_bar_url = WebviewUrl::App(PathBuf::from_str("http://localhost:1420/app-bar").unwrap());
-    let app_bar_window = WebviewWindowBuilder::new(app, "app_bar", app_bar_url)
-        .visible(false)
-        .inner_size(1200.0, container_height)
-        .position(200.0, container_top)
-        // .resizable(false)
+
+    let container_window = tauri::window::WindowBuilder::new(app, "container")
+        .inner_size(width, height)
         .decorations(false)
-        .initialization_script(config_script)
-        .initialization_script(include_str!("./scripts/helpers.js"))
+        .resizable(true)
+        .visible(false)
+        .title("Main Window")
         .build()
         .expect("Failed to build window");
 
-    let app_window = WebviewWindowBuilder::new(app, "app", url)
-        .title("")
-        .parent(&app_bar_window)
-        .expect("Failed to find container window")
-        .user_agent(user_agent)
-        .visible(false)
-        .inner_size(1200.0, container_height - app_bar_height)
-        .position(200.0, container_top + app_bar_height)
-        .auto_resize()
-        .resizable(false)
-        .decorations(false)
-        .initialization_script(config_script)
-        .initialization_script(include_str!("./scripts/icons.js"))
-        .initialization_script(include_str!("./scripts/helpers.js"))
-        .initialization_script(include_str!("./scripts/styles.js"))
-        .initialization_script(include_str!("./scripts/download_manager.js"))
-        .on_download(move |webveiw, ev| {
-            // let b = a.unmanage();
-            if let DownloadEvent::Requested { url, destination } = ev {
-                let download_service = DownloadService::new(webveiw);
-                download_service.on_download(url);
-            }
-            return false;
-        })
-        .build()
-        .expect("Failed to build window");
-
-    vec![app_bar_window, app_window]
+    let _app_bar_window = container_window.add_child(
+        tauri::webview::WebviewBuilder::new("app_bar", app_bar_url)
+            .initialization_script(config_script)
+            .initialization_script(include_str!("./scripts/helpers.js"))
+            .auto_resize(),
+        LogicalPosition::new(0., 0.),
+        LogicalSize::new(width, app_bar_height),
+    );
+    let _app_window = container_window.add_child(
+        tauri::webview::WebviewBuilder::new("app", url)
+            .user_agent(user_agent)
+            .initialization_script(config_script)
+            .initialization_script(include_str!("./scripts/icons.js"))
+            .initialization_script(include_str!("./scripts/helpers.js"))
+            .initialization_script(include_str!("./scripts/styles.js"))
+            .initialization_script(include_str!("./scripts/download_manager.js"))
+            .on_download(move |webveiw, ev| {
+                // let b = a.unmanage();
+                if let DownloadEvent::Requested { url, destination } = ev {
+                    let download_service = DownloadService::new(webveiw);
+                    download_service.on_download(url);
+                }
+                return false;
+            })
+            .auto_resize(),
+        LogicalPosition::new(0., app_bar_height - 1.2),
+        LogicalSize::new(width, height - app_bar_height),
+    );
+    container_window
 }

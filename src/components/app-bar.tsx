@@ -15,6 +15,7 @@ import {
 } from "@tauri-apps/api/window";
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { getAllWebviews } from "@tauri-apps/api/webview";
 
 const AppBar = () => {
   const appWindow = getCurrentWindow();
@@ -30,33 +31,10 @@ const AppBar = () => {
 
   useEffect(() => {
     checkMaximized();
-    appWindow.onResized(async ({ payload: size }) => {
-      const pos = await appWindow.innerPosition();
-      // update app window
-      const windows = await getAllWindows();
-      const app_window = windows.find((w) => w.label == "app");
-
-      app_window?.setPosition(
-        new PhysicalPosition(pos.x, pos.y + barHeightPhysical)
-      );
-      app_window?.setSize(
-        new PhysicalSize(size.width, size.height - barHeightPhysical)
-      );
-    });
-
-    appWindow.onMoved(async ({ payload: position }) => {
-      const windows = await getAllWindows();
-      const app_window = windows.find((w) => w.label == "app");
-
-      app_window?.setPosition(
-        new PhysicalPosition(position.x, position.y + barHeightPhysical)
-      );
-    });
-
     document.addEventListener("click", async (event) => {
       const downloadBtn = document.getElementById("download-btn")!;
       if (!downloadBtn.contains(event.target as Node)) {
-        appWindow.emitTo("app", "close_download_window");
+        appWindow.emit("close_download_window");
       }
     });
   }, []);
@@ -65,8 +43,7 @@ const AppBar = () => {
     <div
       id="appbar"
       style={{ height: barHeight }}
-      data-tauri-drag-region={true}
-    >
+      data-tauri-drag-region={true}>
       <div className="title"></div>
       <div className="buttons">
         <div className="window-controls">
@@ -74,12 +51,8 @@ const AppBar = () => {
             <button
               id="download-btn"
               onClick={() => {
-                appWindow
-                  .emitTo("app", "show_download_window")
-                  .then(() => console.log("done"))
-                  .catch((err) => console.log(err));
-              }}
-            >
+                appWindow.emit("show_download_window");
+              }}>
               <DownloadIcon />
             </button>
           </div>
@@ -95,8 +68,7 @@ const AppBar = () => {
             onClick={() => {
               appWindow.toggleMaximize();
               setIsMaximized((prev) => !prev);
-            }}
-          >
+            }}>
             {isMaximized ? <Minimize /> : <Maximize />}
           </button>
 
