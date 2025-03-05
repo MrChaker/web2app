@@ -31,10 +31,35 @@ const AppBar = () => {
 
   useEffect(() => {
     checkMaximized();
+    appWindow.onResized(async ({ payload: size }) => {
+      // const pos = await appWindow.innerPosition();
+      // update app window
+      const webview = await getAllWindows();
+      console.log(webview);
+      const appWebview = webview.find((w) => w.label == "app");
+      appWebview.show;
+      // appWebview.
+      // app_window?.setPosition(
+      //   new PhysicalPosition(pos.x, pos.y + barHeightPhysical)
+      // );
+      // app_window?.setSize(
+      //   new PhysicalSize(size.width, size.height - barHeightPhysical)
+      // );
+    });
+
+    // appWindow.onMoved(async ({ payload: position }) => {
+    //   const windows = await getAllWindows();
+    //   const app_window = windows.find((w) => w.label == "app");
+
+    //   app_window?.setPosition(
+    //     new PhysicalPosition(position.x, position.y + barHeightPhysical)
+    //   );
+    // });
+
     document.addEventListener("click", async (event) => {
       const downloadBtn = document.getElementById("download-btn")!;
       if (!downloadBtn.contains(event.target as Node)) {
-        appWindow.emit("close_download_window");
+        appWindow.emitTo("app", "close_download_window");
       }
     });
   }, []);
@@ -51,7 +76,11 @@ const AppBar = () => {
             <button
               id="download-btn"
               onClick={() => {
-                appWindow.emit("show_download_window");
+                console.log(appWindow);
+                appWindow
+                  .emit("app", "show_download_window")
+                  .then(() => console.log("done"))
+                  .catch((err) => console.log(err));
               }}>
               <DownloadIcon />
             </button>

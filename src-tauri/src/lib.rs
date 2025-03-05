@@ -28,8 +28,8 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(
             tauri_plugin_keygen::Builder::new(
-                "bd4b05a9-b8eb-4a87-8f7e-3d5c933cff3a",
-                "b8b94aa4f795a0263b8cd87ac98565a05f7d691803acfbb68d998c53321a03d0",
+                env::var("KEYGEN_ACCOUNT_ID").unwrap(),
+                env::var("KEYGEN_VERIFY_KEY").unwrap(),
             )
             .build(),
         )

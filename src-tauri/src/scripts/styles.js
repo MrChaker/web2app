@@ -4,7 +4,7 @@ const css = `
      #settings-window {
       position: fixed;
       top: 0;
-      right: 0;
+      right: 100px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 1rem;
       padding: 1rem 0;

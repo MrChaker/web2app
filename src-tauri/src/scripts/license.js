@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const tauri = window.__TAURI__;
   const invoke = tauri.core.invoke;
-  const webview = tauri.window.getCurrentWindow();
+  const appWindow = tauri.window.getCurrentWindow();
+
   const license = await getLicense(invoke);
 
   let html = `
@@ -22,9 +23,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     document
       .getElementById("deactivateBtn")
       .addEventListener("click", async () => {
-        // await resetLicense(invoke);
+        await resetLicense(invoke);
         // console.log(await tauri.webview.getAllWebviews());
-        invoke("show_app_window");
+        const allWindows = await tauri.window.getAllWindows();
+        const mainWindow = allWindows.find((w) => w.label == "main");
+        mainWindow.show();
+        appWindow.close();
       });
   }, 200);
 });

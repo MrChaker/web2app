@@ -16,7 +16,7 @@ pub struct Params {
 pub fn build_window(app: AppHandle, params: Params) {
     // let package_name = "Google".to_string();
     if let Some(main) = app.get_webview_window("main") {
-        // let _ = main.close();
+        let _ = main.hide();
     };
 
     let url = WebviewUrl::App(PathBuf::from_str("https://desktop.github.com/download/").unwrap());
@@ -72,6 +72,8 @@ pub fn build_window(app: AppHandle, params: Params) {
             .initialization_script(include_str!("../scripts/helpers.js"))
             .initialization_script(include_str!("../scripts/styles.js"))
             .initialization_script(include_str!("../scripts/download_manager.js"))
+            .initialization_script(include_str!("../scripts/settings.js"))
+            .initialization_script(include_str!("../scripts/license.js"))
             .on_download(move |webveiw, ev| {
                 // let b = a.unmanage();
                 if let DownloadEvent::Requested { url, destination } = ev {
