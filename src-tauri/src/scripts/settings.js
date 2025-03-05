@@ -16,6 +16,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.body.style.position = "relative";
   });
 
+  webview.listen("close_settings_window", async (event) => {
+    if (document.getElementById("settingss-window")) {
+      document.getElementById("settingss-window").style.display = "none";
+    }
+  });
+
   // listen for outside click
   document.addEventListener("click", async (event) => {
     const settingsList = document.getElementById("settings-window");

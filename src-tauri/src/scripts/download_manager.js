@@ -68,7 +68,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   webview.listen("close_download_window", async (event) => {
-    console.log(document.getElementById("downloads-window"));
     if (document.getElementById("downloads-window")) {
       document.getElementById("downloads-window").style.display = "none";
     }
