@@ -17,8 +17,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   webview.listen("close_settings_window", async (event) => {
-    if (document.getElementById("settingss-window")) {
-      document.getElementById("settingss-window").style.display = "none";
+    if (document.getElementById("settings-window")) {
+      document.getElementById("settings-window").style.display = "none";
     }
   });
 

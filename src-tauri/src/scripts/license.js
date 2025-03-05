@@ -28,9 +28,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const allWindows = await tauri.window.getAllWindows();
         const mainWindow = allWindows.find((w) => w.label == "main");
         mainWindow.show();
-        appWindow.close();
+        appWindow.hide();
       });
-  }, 200);
+  }, 1000);
 });
 
 function isKeygenError(error) {
