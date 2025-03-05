@@ -27,14 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
 
     // wrap the body content in a div
-    const body_content = document.createElement("div");
-    body_content.innerHTML = document.body.innerHTML;
-    body_content.style.overflowY = "auto";
-    body_content.style.height = `calc(100vh - ${barHeight}px)`;
-    body_content.style.position = `relative`;
+    // const body_content = document.createElement("div");
+    // body_content.innerHTML = document.body.innerHTML;
+    // body_content.style.overflowY = "auto";
+    // body_content.style.height = `calc(100vh - ${barHeight}px)`;
+    // body_content.style.position = `relative`;
 
-    document.body.innerHTML = body_content.outerHTML;
-    document.body.style.overflow = "hidden";
+    // document.body.innerHTML = body_content.outerHTML;
+    // document.body.style.overflow = "hidden";
 
     const app_bar = document.createElement("div");
     app_bar.id = "appbar";
@@ -43,11 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
     app_bar.setAttribute("data-tauri-drag-region", "");
     document.body.prepend(app_bar);
 
-    const spacer = document.createElement("div");
-    spacer.id = "spacer";
-    spacer.style.marginBottom = `${barHeight}px`;
+    // const spacer = document.createElement("div");
+    // spacer.id = "spacer";
+    // spacer.style.marginBottom = `${barHeight}px`;
 
-    document.body.prepend(spacer);
+    // document.body.prepend(spacer);
 
     document.getElementById("hide-btn").addEventListener("click", () => {
       appWindow.minimize();

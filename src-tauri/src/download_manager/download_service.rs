@@ -32,7 +32,7 @@ impl DownloadService {
         self.webveiw.path().download_dir().unwrap()
     }
 
-    pub async fn on_download(&self, url: Url) -> () {
+    pub fn on_download(&self, url: Url) -> () {
         let output_path = self
             .download_path()
             .join(get_filename_from_url(url.to_string()));

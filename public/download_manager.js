@@ -25,14 +25,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   webview.listen("show_download_window", async (event) => {
     document.getElementById("downloads-window").style.display = "block";
-    document.body.style.position = "relative";
     dispatchUpdate();
   });
 
   webview.listen("download-started", async (event) => {
     document.getElementById("downloads-window").style.display = "block";
-    document.body.style.position = "relative";
-
     let id = await addDownload(db, event.payload);
     dispatchUpdate();
 
@@ -67,13 +64,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     dispatchUpdate();
   });
 
-  webview.listen("close_download_window", async (event) => {
-    console.log(document.getElementById("downloads-window"));
-    if (document.getElementById("downloads-window")) {
-      document.getElementById("downloads-window").style.display = "none";
-    }
-  });
-
   // called whenever there is an update to db
   document.addEventListener("update-downloads", async (event) => {
     const downloads = await getDownloads(db);
@@ -82,11 +72,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // listen for click outside the download window to close it
   document.addEventListener("click", async (event) => {
-    const downloadWindow = document.getElementById("downloads-window");
+    const downloadList = document.getElementById("downloads-window");
+    const downloadBtn = document.getElementById("download-btn");
 
-    if (!downloadWindow.contains(event.target)) {
-      downloadWindow.style.display = "none";
+    if (
+      !downloadList.contains(event.target) &&
+      !downloadBtn.contains(event.target)
+    ) {
+      downloadList.style.display = "none";
     }
+  });
+
+  document.getElementById("download-btn").addEventListener("click", () => {
+    const display = document.getElementById("downloads-window").style.display;
+    document.getElementById("downloads-window").style.display =
+      display === "block" ? "none" : "block";
+    dispatchUpdate();
   });
 });
 
@@ -113,12 +114,6 @@ const createDownloadsList = async () => {
     <div id="download-list"></div>
   `;
   downloadList.id = "downloads-window";
-
-  // let managerDiv = document.getElementById("downloads-manager");
-  // while (!managerDiv) {
-  //   await new Promise((resolve) => setTimeout(resolve, 100));
-  //   managerDiv = document.getElementById("downloads-manager");
-  // }
 
   document.body.appendChild(downloadList);
   dispatchUpdate();

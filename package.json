@@ -14,7 +14,10 @@
     "@tauri-apps/plugin-opener": "^2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "tauri-plugin-keygen-api": "github:bagindo/tauri-plugin-keygen#v2"
+    "tauri-plugin-keygen-api": "github:bagindo/tauri-plugin-keygen#v2",
+    "lucide": "^0.477.0",
+    "lucide-react": "^0.477.0",
+    "react-router-dom": "^7.2.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",

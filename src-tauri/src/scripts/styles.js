@@ -1,55 +1,9 @@
 const css = `
 
-    #appbar {
-      background: #fefefe;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 10px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      user-select: none;
-      z-index: 99999999;
-    }
-
-    #appbar .buttons {
-      display: flex;
-      gap: 40px;
-    }
-
-    #appbar .window-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    #appbar button {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #appbar button:hover {
-      background: #eaeaea;
-    }
-
-    #downloads-manager,
-    #settings-manager {
-      position: relative;
-    }
-
      #downloads-window, 
      #settings-window {
-      position: absolute;
-      top: 100%;
+      position: fixed;
+      top: 0;
       right: 0;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 1rem;
@@ -58,6 +12,7 @@ const css = `
       background-color: white;
       font-size: 0.8rem;
       color: rgb(80, 80, 80);
+      z-index: 99999;
     }
 
     #downloads-window h3,
@@ -109,8 +64,17 @@ const css = `
       margin: 0;
       color: #666;
     }
-    .actions button:hover {
+
+    .actions button {
       border-radius: 100%;
+      border: 1px solid #f5f5f5;
+      display: flex;
+      padding: 8px;
+      background-color: #fff;
+    }
+
+    .actions button:hover {
+      background-color: rgb(192, 192, 192);
     }
 
     .progress-bar {
