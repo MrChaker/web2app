@@ -61,6 +61,8 @@ pub async fn build_window(app: &mut App) -> Window {
             .initialization_script(include_str!("./scripts/helpers.js"))
             .initialization_script(include_str!("./scripts/styles.js"))
             .initialization_script(include_str!("./scripts/download_manager.js"))
+            .initialization_script(include_str!("./scripts/settings.js"))
+            .initialization_script(include_str!("./scripts/license.js"))
             .on_download(move |webveiw, ev| {
                 // let b = a.unmanage();
                 if let DownloadEvent::Requested { url, destination } = ev {
