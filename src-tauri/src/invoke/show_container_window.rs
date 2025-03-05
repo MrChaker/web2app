@@ -13,6 +13,6 @@ pub fn show_container_window(app: AppHandle) {
         let _ = main.hide();
     };
     if let Some(container) = app.get_window("container") {
-        let _ = container.hide();
+        let _ = container.show();
     };
 }
