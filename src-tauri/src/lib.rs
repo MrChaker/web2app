@@ -4,14 +4,15 @@ pub mod migrations;
 pub mod utils;
 pub mod window;
 use crate::invoke::{
-    build_window::build_window, cancel_download::cancel_download,
-    download_binary_file::download_binary_file, download_file::download_file,
+    cancel_download::cancel_download, download_binary_file::download_binary_file,
+    download_file::download_file, show_container_window::show_container_window,
 };
 use dotenv::dotenv;
 use migrations::get_migrations;
 use std::env;
 use std::sync::Mutex;
 use tauri::Manager;
+use window::build_window;
 
 #[derive(Default)]
 pub struct AppState {
@@ -43,17 +44,16 @@ pub fn run() {
         .setup(move |app| {
             // println!("conifg {:?}", app.path().app_config_dir());
             app.manage(Mutex::new(AppState::default()));
-            // tauri::async_runtime::block_on(async move {
-            //     let window = build_window(app).await;
-            //     window.show().unwrap();
-            // });
+            tauri::async_runtime::block_on(async move {
+                let window = build_window(app).await;
+            });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             download_file,
             download_binary_file,
             cancel_download,
-            build_window,
+            show_container_window,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

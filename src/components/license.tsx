@@ -25,12 +25,7 @@ const License = () => {
     if (license === null) {
       setKey(licenseKey || "");
     } else {
-      invoke("build_window", {
-        params: {
-          expiry: license.expiry,
-          key: license.key,
-        },
-      });
+      invoke("show_container_window");
     }
   };
   useEffect(() => {
@@ -55,12 +50,7 @@ const License = () => {
 
     // check license
     if (license.valid) {
-      invoke("build_window", {
-        params: {
-          expiry: license.expiry,
-          key: license.key,
-        },
-      });
+      invoke("show_container_window");
     } else {
       setErr(`${license.code}: ${license.detail}`);
     }
