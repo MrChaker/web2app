@@ -6,8 +6,7 @@ import {
   SettingsIcon,
   X,
 } from "lucide-react";
-import { getCurrentWindow, getAllWindows } from "@tauri-apps/api/window";
-import { getCurrentWebview, getAllWebviews } from "@tauri-apps/api/webview";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 

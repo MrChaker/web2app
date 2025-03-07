@@ -5072,7 +5072,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-keygen"
 version = "2.0.0"
-source = "git+https://github.com/bagindo/tauri-plugin-keygen?branch=v2#e0de03a76a5c82c36adb347e43e4bff4f78c87de"
+source = "git+https://github.com/MrChaker/tauri-plugin-keygen?branch=v2#16253b0d17af546d5fbe41adb6eb9c563ab31fae"
 dependencies = [
  "aes-gcm",
  "base64 0.21.7",

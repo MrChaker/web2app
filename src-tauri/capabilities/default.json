@@ -9,6 +9,8 @@
     "keygen:allow-validate-key",
     "keygen:default",
     "keygen:allow-get-license",
-    "keygen:allow-get-license-key"
+    "keygen:allow-get-license-key",
+    "core:webview:allow-webview-show",
+    "core:webview:allow-webview-hide"
   ]
 }

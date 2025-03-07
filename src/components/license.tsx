@@ -7,6 +7,7 @@ import {
   KeygenLicense,
   validateKey,
 } from "tauri-plugin-keygen-api";
+import { updateLicense } from "../utils";
 
 const License = () => {
   // license validation logic
@@ -21,7 +22,6 @@ const License = () => {
     let license = await getLicense();
     let licenseKey = await getLicenseKey();
 
-    console.log(license);
     if (license === null) {
       setKey(licenseKey || "");
     } else {
@@ -49,8 +49,17 @@ const License = () => {
     }
 
     // check license
-    if (license.valid) {
-      invoke("show_container_window");
+    if (license.metadata.used) {
+      setErr(`License already used by another machine`);
+    } else if (license.valid) {
+      // update license metadata via api
+      await updateLicense((license as any).id, true)
+        .then(() => {
+          invoke("show_container_window");
+        })
+        .catch(() => {
+          setErr("Something went wrong");
+        });
     } else {
       setErr(`${license.code}: ${license.detail}`);
     }

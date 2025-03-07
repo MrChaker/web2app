@@ -1,6 +1,6 @@
 import { CircleX } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { formatTimeStringToDate } from "../utils";
+import { formatTimeStringToDate, updateLicense } from "../utils";
 import {
   getLicense,
   KeygenLicense,
@@ -72,7 +72,7 @@ const LicenseInfo = () => {
       </p>
       <p>
         <span style={{ fontWeight: "bold" }}>Issued on:</span>{" "}
-        {formatTimeStringToDate(license?.metadata?.issued) || "-"}
+        {formatTimeStringToDate((license as any)?.created) || "-"}
       </p>
       <p>
         <span style={{ fontWeight: "bold" }}>Valid Until:</span>{" "}
@@ -81,13 +81,17 @@ const LicenseInfo = () => {
       <div
         id="deactivateBtn"
         onClick={async () => {
-          await resetLicense();
-          const allWindows = await getAllWindows();
-          const mainWindow = allWindows.find((w) => w.label == "main");
-          const appWindow = allWindows.find((w) => w.label == "container");
+          await updateLicense((license as any).id, false)
+            .then(async () => {
+              await resetLicense();
+              const allWindows = await getAllWindows();
+              const mainWindow = allWindows.find((w) => w.label == "main");
+              const appWindow = allWindows.find((w) => w.label == "container");
 
-          mainWindow?.show();
-          appWindow?.hide();
+              mainWindow?.show();
+              appWindow?.hide();
+            })
+            .catch(() => {});
         }}
         style={{
           cursor: "pointer",
