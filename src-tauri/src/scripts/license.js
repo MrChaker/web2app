@@ -5,10 +5,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const license = await getLicense(invoke);
 
+  console.log(license);
   let html = `
     <h4 style="text-align: center; margin: 1rem 0;">-- License --</h4>
     <p><span style="font-weight: bold">Status:<span> ${
       license.valid ? "🟢" : "🔴"
+    }</p>
+    <p><span style="font-weight: bold">Issued on:<span> ${
+      window.formatTimeStringToDate(license?.metadata?.issued) || "-"
     }</p>
     <p><span style="font-weight: bold">Valid Until:<span> ${
       window.formatTimeStringToDate(license?.expiry) || "-"

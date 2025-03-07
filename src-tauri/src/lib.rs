@@ -12,6 +12,7 @@ use migrations::get_migrations;
 use std::env;
 use std::sync::Mutex;
 use tauri::Manager;
+use tauri_plugin_sql::SqliteConnectOptions;
 use window::build_window;
 
 #[derive(Default)]
@@ -23,6 +24,7 @@ pub struct AppState {
 pub fn run() {
     let app = tauri::Builder::default();
     let _ = dotenv().expect("Failed to load .env file");
+    let db_key = env::var("DATABASE_KEY").expect("DATABASE_KEY not found");
 
     app
         // .plugin(tauri_plugin_prevent_default::init())
@@ -37,6 +39,10 @@ pub fn run() {
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations("sqlite:test-encryption.db", get_migrations())
+                .add_sqlite_options(
+                    "sqlite:test-encryption.db",
+                    SqliteConnectOptions::new().pragma("key", db_key),
+                )
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())

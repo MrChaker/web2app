@@ -3,14 +3,21 @@ import {
   Maximize,
   Minimize,
   Minus,
-  Settings,
+  SettingsIcon,
   X,
 } from "lucide-react";
-import "./app-bar.css";
 import { getCurrentWindow, getAllWindows } from "@tauri-apps/api/window";
-import { useEffect, useState } from "react";
+import { getCurrentWebview, getAllWebviews } from "@tauri-apps/api/webview";
 
-const AppBar = () => {
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+
+const AppBar = ({
+  setDownloadsOpen,
+  setSettingsOpen,
+}: {
+  setDownloadsOpen: Dispatch<SetStateAction<boolean>>;
+  setSettingsOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
   const appWindow = getCurrentWindow();
   const barHeight = 38;
   const [isMaximized, setIsMaximized] = useState(false);
@@ -24,7 +31,7 @@ const AppBar = () => {
     document.addEventListener("click", async (event) => {
       const downloadBtn = document.getElementById("download-btn")!;
       if (!downloadBtn.contains(event.target as Node)) {
-        appWindow.emit("close_download_window");
+        setDownloadsOpen(false);
       }
 
       const settingsBtn = document.getElementById("settings-btn")!;
@@ -39,25 +46,32 @@ const AppBar = () => {
       id="appbar"
       style={{ height: barHeight }}
       data-tauri-drag-region={true}>
-      <div className="title"></div>
+      <div className="title">
+        {(window as any).config.icon && (
+          <img src={(window as any).config.icon} />
+        )}
+        {(window as any).config.app_name}
+      </div>
       <div className="buttons">
         <div className="window-controls">
           <div id="downloads-manager">
             <button
               id="download-btn"
               onClick={() => {
-                appWindow.emit("show_download_window");
+                setDownloadsOpen((prev) => !prev);
               }}>
               <DownloadIcon />
             </button>
           </div>
-          <button
-            id="settings-btn"
-            onClick={() => {
-              appWindow.emit("show_settings_window");
-            }}>
-            <Settings />
-          </button>
+          <div id="settings-manager">
+            <button
+              id="settings-btn"
+              onClick={() => {
+                setSettingsOpen((prev) => !prev);
+              }}>
+              <SettingsIcon />
+            </button>
+          </div>
         </div>
         <div className="window-controls">
           <button onClick={() => appWindow.minimize()}>
