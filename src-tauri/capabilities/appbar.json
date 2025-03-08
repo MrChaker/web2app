@@ -19,6 +19,8 @@
     "core:webview:allow-webview-hide",
     "core:webview:allow-webview-show",
     "core:webview:allow-webview-close",
+    "core:webview:allow-set-webview-position",
+
     "core:event:default",
     "sql:default",
     "sql:allow-execute",

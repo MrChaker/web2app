@@ -5,9 +5,15 @@ import DownloadsManager from "./components/downloads";
 import { getAllWebviews, getCurrentWebview } from "@tauri-apps/api/webview";
 import { useEffect, useState } from "react";
 import Settings from "./components/settings";
+import {
+  getCurrentWindow,
+  LogicalPosition,
+  PhysicalPosition,
+} from "@tauri-apps/api/window";
 
 function App() {
   const webview = getCurrentWebview();
+  const window = getCurrentWindow();
 
   const [downloadsOpen, setDownloadsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -38,6 +44,16 @@ function App() {
   };
 
   useEffect(() => {
+    window.onResized(async ({ payload: size }) => {
+      let pos = await webview.position();
+      if (webview.label === "downloads") {
+        webview.setPosition(new PhysicalPosition(size.width - 1000, pos.y));
+      }
+      if (webview.label === "settings") {
+        webview.setPosition(new PhysicalPosition(size.width - 600, pos.y));
+      }
+    });
+
     const unlisteners = [
       webview.listen("download_toggled", (event) => {
         setDownloadsOpen(event.payload as boolean);

@@ -86,17 +86,15 @@ pub async fn build_window(app: &mut App) -> Window {
 
     let _downloads_window = container_window.add_child(
         tauri::webview::WebviewBuilder::new("downloads", react_url.clone())
-            .initialization_script(config_script)
-            .background_color(Color(0, 0, 0, 0)), // .auto_resize()
-        LogicalPosition::new(width - 600., app_bar_height - 1.2),
+            .initialization_script(config_script),
+        LogicalPosition::new(width - 600., app_bar_height),
         LogicalSize::new(400., 510.0),
     );
 
     let _settings_window = container_window.add_child(
         tauri::webview::WebviewBuilder::new("settings", react_url)
-            .initialization_script(config_script)
-            .background_color(Color(0, 0, 0, 0)), // .auto_resize()
-        LogicalPosition::new(width - 300., app_bar_height - 1.2),
+            .initialization_script(config_script),
+        LogicalPosition::new(width - 300., app_bar_height),
         LogicalSize::new(250., 300.0),
     );
 
