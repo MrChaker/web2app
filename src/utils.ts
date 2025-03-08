@@ -63,28 +63,36 @@ export function getParentDirectory(path: string): string {
   return parentPath;
 }
 
-export const updateLicense = async (id: string, used: boolean) => {
-  return await fetch(
+export const deactivateMachine = async (id: string, key: string) => {
+  // get machine
+  const res = await fetch(
     `https://api.keygen.sh/v1/accounts/${
       import.meta.env.VITE_KEYGEN_ACCOUNT_ID
-    }/licenses/${id}`,
+    }/licenses/${id}/machines`,
     {
-      method: "PATCH",
+      method: "GET",
       headers: {
         "Content-Type": "application/vnd.api+json",
         Accept: "application/vnd.api+json",
-        Authorization: `Bearer ${import.meta.env.VITE_KEYGEN_TOKEN}`,
+        Authorization: `License ${key}`,
       },
-      body: JSON.stringify({
-        data: {
-          type: "licenses",
-          attributes: {
-            metadata: {
-              used,
-            },
-          },
-        },
-      }),
     }
   );
+  const { data: machines } = await res.json();
+  console.log(machines[0]);
+
+  const deleteRes = await fetch(
+    `https://api.keygen.sh/v1/accounts/${
+      import.meta.env.VITE_KEYGEN_ACCOUNT_ID
+    }/machines/${machines[0].id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/vnd.api+json",
+        Accept: "application/vnd.api+json",
+        Authorization: `License ${key}`,
+      },
+    }
+  );
+  return deleteRes;
 };

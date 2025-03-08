@@ -1,6 +1,6 @@
 import { CircleX } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { formatTimeStringToDate, updateLicense } from "../utils";
+import { formatTimeStringToDate, deactivateMachine } from "../utils";
 import {
   getLicense,
   KeygenLicense,
@@ -55,12 +55,12 @@ const Settings = ({
 
 const LicenseInfo = () => {
   const [license, setLicense] = useState<KeygenLicense | null>();
-  const getchLicense = async () => {
+  const fetchLicense = async () => {
     const l = await getLicense();
     setLicense(l);
   };
   useEffect(() => {
-    getchLicense();
+    fetchLicense();
   }, []);
 
   return (
@@ -81,7 +81,7 @@ const LicenseInfo = () => {
       <div
         id="deactivateBtn"
         onClick={async () => {
-          await updateLicense((license as any).id, false)
+          await deactivateMachine((license as any).id, license?.key!)
             .then(async () => {
               await resetLicense();
               const allWindows = await getAllWindows();
