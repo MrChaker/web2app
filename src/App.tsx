@@ -6,10 +6,11 @@ import { getAllWebviews, getCurrentWebview } from "@tauri-apps/api/webview";
 import { useEffect, useState } from "react";
 import Settings from "./components/settings";
 import {
+  getAllWindows,
   getCurrentWindow,
-  LogicalPosition,
   PhysicalPosition,
 } from "@tauri-apps/api/window";
+import { getLicense, resetLicense } from "tauri-plugin-keygen-api";
 
 function App() {
   const webview = getCurrentWebview();
@@ -43,7 +44,25 @@ function App() {
     webview.emit("settings_toggled", settingsOpen);
   };
 
+  const checkLicense = async () => {
+    if (webview.label === "main") {
+      return;
+    }
+
+    let license = await getLicense();
+    let expired = license?.expiry && new Date(license?.expiry) <= new Date();
+    if (!license?.valid || expired) {
+      await resetLicense();
+      const allWindows = await getAllWindows();
+      const mainWindow = allWindows.find((w) => w.label == "main");
+      const appWindow = allWindows.find((w) => w.label == "container");
+
+      mainWindow?.show();
+      appWindow?.hide();
+    }
+  };
   useEffect(() => {
+    checkLicense();
     window.onResized(async ({ payload: size }) => {
       let pos = await webview.position();
       if (webview.label === "downloads") {
