@@ -9,6 +9,7 @@ import {
   getAllWindows,
   getCurrentWindow,
   PhysicalPosition,
+  PhysicalSize,
 } from "@tauri-apps/api/window";
 import { getLicense, resetLicense } from "tauri-plugin-keygen-api";
 
@@ -63,15 +64,23 @@ function App() {
   };
   useEffect(() => {
     checkLicense();
-    window.onResized(async ({ payload: size }) => {
-      let pos = await webview.position();
-      if (webview.label === "downloads") {
-        webview.setPosition(new PhysicalPosition(size.width - 1000, pos.y));
-      }
-      if (webview.label === "settings") {
-        webview.setPosition(new PhysicalPosition(size.width - 600, pos.y));
-      }
-    });
+
+    if (window.label === "container") {
+      window.onResized(async ({ payload: size }) => {
+        let pos = await webview.position();
+        if (webview.label === "downloads") {
+          webview.setPosition(new PhysicalPosition(size.width - 1000, pos.y));
+        }
+        if (webview.label === "settings") {
+          webview.setPosition(new PhysicalPosition(size.width - 600, pos.y));
+        }
+
+        if (webview.label === "app_bar") {
+          let appBarSize = await webview.size();
+          webview.setSize(new PhysicalSize(size.width, appBarSize.height));
+        }
+      });
+    }
 
     const unlisteners = [
       webview.listen("download_toggled", (event) => {

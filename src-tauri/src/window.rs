@@ -78,8 +78,7 @@ pub async fn build_window(app: &mut App) -> Window {
 
     let _app_bar_window = container_window.add_child(
         tauri::webview::WebviewBuilder::new("app_bar", react_url.clone())
-            .initialization_script(config_script)
-            .auto_resize(),
+            .initialization_script(config_script),
         LogicalPosition::new(0., 0.),
         LogicalSize::new(width, app_bar_height),
     );
