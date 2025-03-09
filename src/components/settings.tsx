@@ -1,5 +1,5 @@
 import { CircleX } from "lucide-react";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { formatTimeStringToDate, deactivateMachine } from "../utils";
 import {
   getLicense,
@@ -8,6 +8,7 @@ import {
 } from "tauri-plugin-keygen-api";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getAllWindows } from "@tauri-apps/api/window";
+import { Database } from "../global";
 
 const Settings = ({
   setOpen,
@@ -55,12 +56,28 @@ const Settings = ({
 
 const LicenseInfo = () => {
   const [license, setLicense] = useState<KeygenLicense | null>();
+  const sql: Database = (window as any).__TAURI__.sql;
+  const dbRef = useRef<Database | null>(null);
+
+  const initialize = async () => {
+    try {
+      const db = await sql.load(
+        "sqlite:test-encryption.db",
+        import.meta.env.VITE_DATABASE_KEY
+      );
+      dbRef.current = db;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const webview = getCurrentWebview();
   const fetchLicense = async () => {
     const l = await getLicense();
     setLicense(l);
   };
   useEffect(() => {
+    initialize();
     fetchLicense();
 
     webview.listen("licensed", () => {
@@ -89,6 +106,7 @@ const LicenseInfo = () => {
           await deactivateMachine((license as any).id, license?.key!)
             .then(async () => {
               await resetLicense();
+              await deleteLicenseKey(dbRef.current);
               const allWindows = await getAllWindows();
               const mainWindow = allWindows.find((w) => w.label == "main");
               const appWindow = allWindows.find((w) => w.label == "container");
@@ -105,6 +123,10 @@ const LicenseInfo = () => {
       </div>
     </div>
   );
+};
+
+const deleteLicenseKey = async (db: Database | null): Promise<void> => {
+  if (db) await db.execute("DELETE FROM license_key WHERE id = 1");
 };
 
 export default Settings;

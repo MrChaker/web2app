@@ -38,6 +38,7 @@ const License = () => {
 
     if (license === null) {
       setKey(key);
+      appWindow.show();
     } else {
       invoke("show_container_window");
       appWindow.emit("licensed");
@@ -64,8 +65,9 @@ const License = () => {
       return;
     }
 
-    // remove license key from cache
-    await resetLicenseKey();
+    // // remove license key from cache
+    // await resetLicenseKey();
+
     // store it in db
     if (dbRef.current) await putLicenseKey(dbRef.current, license.key);
     // check license
