@@ -1,6 +1,12 @@
 import { CircleX } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { formatTimeStringToDate, deactivateMachine } from "../utils";
+import {
+  formatTimeStringToDate,
+  deactivateMachine,
+  getLicenseMachine,
+  pingHeartbeat,
+  showLicenseFrom,
+} from "../utils";
 import {
   getLicense,
   KeygenLicense,
@@ -12,8 +18,10 @@ import { Database } from "../global";
 
 const Settings = ({
   setOpen,
+  db,
 }: {
   setOpen: Dispatch<SetStateAction<boolean>>;
+  db: Database | null;
 }) => {
   const webview = getCurrentWebview();
 
@@ -48,39 +56,42 @@ const Settings = ({
         Settings <CircleX onClick={() => setOpen(false)} />{" "}
       </h3>
       <div id="settings-list">
-        <LicenseInfo />
+        <LicenseInfo db={db} />
       </div>
     </div>
   );
 };
 
-const LicenseInfo = () => {
+const LicenseInfo = ({ db }: { db: Database | null }) => {
   const [license, setLicense] = useState<KeygenLicense | null>();
-  const sql: Database = (window as any).__TAURI__.sql;
-  const dbRef = useRef<Database | null>(null);
-
-  const initialize = async () => {
-    try {
-      const db = await sql.load(
-        "sqlite:test-encryption.db",
-        import.meta.env.VITE_DATABASE_KEY
-      );
-      dbRef.current = db;
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const webview = getCurrentWebview();
   const fetchLicense = async () => {
     const l = await getLicense();
     setLicense(l);
   };
-  useEffect(() => {
-    initialize();
-    fetchLicense();
 
-    webview.listen("licensed", () => {
+  const heartbeat = () => {
+    const clearInterval = setInterval(() => {
+      pingHeartbeat((license as any).id, license?.key!).catch(async () => {
+        showLicenseFrom(db);
+      });
+    }, import.meta.env.VITE_HEARTBEAT_INTERVAL * 60 * 1000 - 20000); // ping before 20 seconds of end
+    return clearInterval;
+  };
+
+  useEffect(() => {
+    let interval: number;
+    if (license?.valid) interval = heartbeat();
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [license]);
+
+  useEffect(() => {
+    fetchLicense();
+    webview.listen("licensed", async () => {
       fetchLicense();
     });
   }, []);
@@ -105,14 +116,7 @@ const LicenseInfo = () => {
         onClick={async () => {
           await deactivateMachine((license as any).id, license?.key!)
             .then(async () => {
-              await resetLicense();
-              await deleteLicenseKey(dbRef.current);
-              const allWindows = await getAllWindows();
-              const mainWindow = allWindows.find((w) => w.label == "main");
-              const appWindow = allWindows.find((w) => w.label == "container");
-
-              mainWindow?.show();
-              appWindow?.hide();
+              showLicenseFrom(db);
             })
             .catch(() => {});
         }}
@@ -123,10 +127,6 @@ const LicenseInfo = () => {
       </div>
     </div>
   );
-};
-
-const deleteLicenseKey = async (db: Database | null): Promise<void> => {
-  if (db) await db.execute("DELETE FROM license_key WHERE id = 1");
 };
 
 export default Settings;

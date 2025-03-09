@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "appbar",
-  "description": "Capability for the appbar window",
+  "description": "Capability for the app window",
   "windows": ["app", "app_bar", "container"],
   "remote": {
     "urls": ["https://*.*", "http://*.*"]
@@ -31,6 +31,8 @@
     "keygen:allow-reset-license",
     "keygen:allow-get-license",
     "core:window:allow-set-size",
-    "core:window:allow-set-position"
+    "core:window:allow-set-position",
+    "keygen:allow-validate-key",
+    "keygen:allow-activate"
   ]
 }

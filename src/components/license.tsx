@@ -1,51 +1,35 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import {
   getLicense,
   KeygenError,
   KeygenLicense,
-  resetLicenseKey,
   validateKey,
 } from "tauri-plugin-keygen-api";
 import { Database } from "../global";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { pingHeartbeat } from "../utils";
 
-const License = () => {
+const License = ({ db }: { db: Database | null }) => {
   // license validation logic
 
   const [key, setKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const appWindow = (window as any).__TAURI__.window.getCurrentWindow();
-  const sql: Database = (window as any).__TAURI__.sql;
-  const dbRef = useRef<Database | null>(null);
-
-  const initialize = async () => {
-    try {
-      const db = await sql.load(
-        "sqlite:test-encryption.db",
-        import.meta.env.VITE_DATABASE_KEY
-      );
-      dbRef.current = db;
-      setKey((await getLicenseKey(db)) || "");
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const beforeLoad = async () => {
     let license = await getLicense();
 
-    if (license === null) {
+    if (!license?.valid) {
       setKey(key);
       appWindow.show();
-    } else {
-      invoke("show_container_window");
-      appWindow.emit("licensed");
+      return;
     }
+    invoke("show_container_window");
+    appWindow.emit("licensed");
+    return;
   };
   useEffect(() => {
-    initialize();
     beforeLoad();
   }, []);
 
@@ -69,14 +53,25 @@ const License = () => {
     // await resetLicenseKey();
 
     // store it in db
-    if (dbRef.current) await putLicenseKey(dbRef.current, license.key);
+    if (db) await putLicenseKey(db, license.key);
     // check license
     if (license.valid) {
       invoke("show_container_window");
       appWindow.emit("licensed");
-    } else {
-      setErr(`${license.code}: ${license.detail}`);
+      return;
     }
+    if (license.code === "HEARTBEAT_NOT_STARTED") {
+      await pingHeartbeat((license as any).id, license.key)
+        .then(async () => {
+          await validateKey({ key }); // validate again to update
+          invoke("show_container_window");
+          appWindow.emit("licensed");
+        })
+        .catch(() => setErr(`${license.code}: ${license.detail}`));
+      setLoading(false);
+      return;
+    }
+    setErr(`${license.code}: ${license.detail}`);
 
     setLoading(false);
   };
@@ -97,7 +92,7 @@ const License = () => {
   );
 };
 
-const getLicenseKey = async (db: Database): Promise<string> => {
+export const getLicenseKey = async (db: Database): Promise<string> => {
   const key: { key: string }[] = await db.select("SELECT * FROM license_key");
   return key?.[0]?.key || "";
 };

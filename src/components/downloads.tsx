@@ -31,15 +31,15 @@ type DownloadType = {
 
 const DownloadsManager = ({
   setOpen,
+  db,
 }: {
   setOpen: Dispatch<SetStateAction<boolean>>;
+  db: Database | null;
 }) => {
   const [downloads, setDownloads] = useState<DownloadType[]>([]);
 
   const webview = getCurrentWebview();
   const windowRef = useRef<HTMLDivElement | null>(null);
-  const sql: Database = (window as any).__TAURI__.sql;
-  const dbRef = useRef<Database | null>(null);
 
   const listenForOutSideClick = async () => {
     const unlisten = webview.listen("outside-click", () => {
@@ -66,20 +66,11 @@ const DownloadsManager = ({
 
   useEffect(() => {
     const initialize = async () => {
-      try {
-        const db = await sql.load(
-          "sqlite:test-encryption.db",
-          (window as any).config.db_key
-        );
-
-        dbRef.current = db;
+      if (db) {
         await cancelAllDownloadsInProgress(db);
         loadDownloads(db);
-      } catch (err) {
-        console.error(err);
       }
     };
-
     initialize();
 
     const listeners = [
@@ -105,7 +96,7 @@ const DownloadsManager = ({
       listeners.forEach(async (unlisten) => await unlisten);
       document.removeEventListener("click", handleClickOutside);
     };
-  }, []);
+  }, [db]);
 
   const loadDownloads = async (db: Database) => {
     const downloads = await getDownloads(db);
@@ -115,8 +106,8 @@ const DownloadsManager = ({
   const handleDownloadStarted = async (event: any) => {
     setOpen(true);
 
-    const id = await addDownload(dbRef.current!, event.payload);
-    await loadDownloads(dbRef.current!);
+    const id = await addDownload(db!, event.payload);
+    await loadDownloads(db!);
     invoke("download_file", {
       params: {
         id: String(id),
@@ -127,27 +118,27 @@ const DownloadsManager = ({
   };
 
   const handleDownloadProgress = async (event: any) => {
-    await updateDownload(dbRef.current!, {
+    await updateDownload(db!, {
       ...event.payload,
       state: State.in_progress,
     });
-    loadDownloads(dbRef.current!);
+    loadDownloads(db!);
   };
 
   const handleDownloadSuccess = async (event: any) => {
-    await updateDownload(dbRef.current!, {
+    await updateDownload(db!, {
       ...event.payload,
       state: State.finished,
     });
-    loadDownloads(dbRef.current!);
+    loadDownloads(db!);
   };
 
   const handleDownloadFailed = async (event: any) => {
-    await updateDownload(dbRef.current!, {
+    await updateDownload(db!, {
       ...event.payload,
       state: State.failed,
     });
-    loadDownloads(dbRef.current!);
+    loadDownloads(db!);
   };
 
   return (
@@ -165,11 +156,7 @@ const DownloadsManager = ({
       </h3>
       <div id="download-list">
         {downloads.map((download) => (
-          <DownloadRow
-            key={download.id}
-            download={download}
-            db={dbRef.current}
-          />
+          <DownloadRow key={download.id} download={download} db={db} />
         ))}
       </div>
     </div>

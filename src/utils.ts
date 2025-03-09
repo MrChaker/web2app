@@ -1,3 +1,7 @@
+import { resetLicense } from "tauri-plugin-keygen-api";
+import { Database } from "./global";
+import { getAllWindows } from "@tauri-apps/api/window";
+
 export const durationPastFromDate = (date: string | number | Date): string => {
   const now = new Date();
   const diff = now.getTime() - new Date(date).getTime();
@@ -63,7 +67,7 @@ export function getParentDirectory(path: string): string {
   return parentPath;
 }
 
-export const deactivateMachine = async (id: string, key: string) => {
+export const getLicenseMachine = async (id: string, key: string) => {
   // get machine
   const res = await fetch(
     `https://api.keygen.sh/v1/accounts/${
@@ -79,12 +83,21 @@ export const deactivateMachine = async (id: string, key: string) => {
     }
   );
   const { data: machines } = await res.json();
-  console.log(machines[0]);
+  return machines[0].id;
+};
+
+export const deactivateMachine = async (
+  id: string,
+  key: string,
+  machineId: string | null | undefined = undefined
+) => {
+  // get machine
+  machineId = machineId || (await getLicenseMachine(id, key));
 
   const deleteRes = await fetch(
     `https://api.keygen.sh/v1/accounts/${
       import.meta.env.VITE_KEYGEN_ACCOUNT_ID
-    }/machines/${machines[0].id}`,
+    }/machines/${machineId}`,
     {
       method: "DELETE",
       headers: {
@@ -95,4 +108,42 @@ export const deactivateMachine = async (id: string, key: string) => {
     }
   );
   return deleteRes;
+};
+
+export const pingHeartbeat = async (
+  id: string,
+  key: string,
+  machineId: string | null | undefined = undefined
+) => {
+  // get machine
+  machineId = machineId || (await getLicenseMachine(id, key));
+
+  await fetch(
+    `https://api.keygen.sh/v1/accounts/${
+      import.meta.env.VITE_KEYGEN_ACCOUNT_ID
+    }/machines/${machineId}/actions/ping`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/vnd.api+json",
+        Accept: "application/vnd.api+json",
+        Authorization: `License ${key}`,
+      },
+    }
+  );
+};
+
+export const showLicenseFrom = async (db: Database | null) => {
+  await resetLicense();
+  await deleteLicenseKey(db);
+  const allWindows = await getAllWindows();
+  const mainWindow = allWindows.find((w) => w.label == "main");
+  const appWindow = allWindows.find((w) => w.label == "container");
+
+  mainWindow?.show();
+  appWindow?.hide();
+};
+
+const deleteLicenseKey = async (db: Database | null): Promise<void> => {
+  if (db) await db.execute("DELETE FROM license_key WHERE id = 1");
 };

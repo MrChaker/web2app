@@ -1,9 +1,9 @@
 import "./App.css";
 import AppBar from "./components/app-bar";
-import License from "./components/license";
+import License, { getLicenseKey } from "./components/license";
 import DownloadsManager from "./components/downloads";
 import { getAllWebviews, getCurrentWebview } from "@tauri-apps/api/webview";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Settings from "./components/settings";
 import {
   getAllWindows,
@@ -11,11 +11,15 @@ import {
   PhysicalPosition,
   PhysicalSize,
 } from "@tauri-apps/api/window";
-import { getLicense, resetLicense } from "tauri-plugin-keygen-api";
+import { resetLicense, validateKey } from "tauri-plugin-keygen-api";
+import { deactivateMachine, getLicenseMachine, showLicenseFrom } from "./utils";
+import { Database } from "./global";
 
 function App() {
   const webview = getCurrentWebview();
-  const window = getCurrentWindow();
+  const sql: Database = (window as any).__TAURI__.sql;
+  const appWindow = getCurrentWindow();
+  const dbRef = useRef<Database | null>(null);
 
   const [downloadsOpen, setDownloadsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -50,23 +54,45 @@ function App() {
       return;
     }
 
-    let license = await getLicense();
+    let license = await validateKey({
+      key: await getLicenseKey(dbRef.current!),
+    });
     let expired = license?.expiry && new Date(license?.expiry) <= new Date();
-    if (!license?.valid || expired) {
-      await resetLicense();
-      const allWindows = await getAllWindows();
-      const mainWindow = allWindows.find((w) => w.label == "main");
-      const appWindow = allWindows.find((w) => w.label == "container");
+    let machineId =
+      license && (await getLicenseMachine((license as any).id, license.key));
 
-      mainWindow?.show();
-      appWindow?.hide();
+    if (!license?.valid || expired || !machineId) {
+      await deactivateMachine(
+        (license as any).id,
+        license?.key!,
+        machineId
+      ).then(async () => {
+        showLicenseFrom(dbRef.current);
+      });
     }
   };
-  useEffect(() => {
-    checkLicense();
+  const initializeDb = async () => {
+    try {
+      const db = await sql.load(
+        "sqlite:test-encryption.db",
+        import.meta.env.VITE_DATABASE_KEY
+      );
+      console.log(db);
 
-    if (window.label === "container") {
-      window.onResized(async ({ payload: size }) => {
+      dbRef.current = db;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    initializeDb().then(() => {
+      console.log("first");
+      checkLicense();
+    });
+
+    if (appWindow.label === "container") {
+      appWindow.onResized(async ({ payload: size }) => {
         let pos = await webview.position();
         if (webview.label === "downloads") {
           webview.setPosition(new PhysicalPosition(size.width - 1000, pos.y));
@@ -105,17 +131,17 @@ function App() {
   }, [settingsOpen]);
 
   if (webview.label === "main") {
-    return <License />;
+    return <License db={dbRef.current} />;
   } else if (webview.label === "downloads") {
     document.body.style.maxHeight = "501px";
     document.body.style.overflow = "hidden";
 
-    return <DownloadsManager setOpen={setDownloadsOpen} />;
+    return <DownloadsManager db={dbRef.current} setOpen={setDownloadsOpen} />;
   } else if (webview.label === "settings") {
     document.body.style.maxHeight = "300px";
     document.body.style.overflow = "hidden";
 
-    return <Settings setOpen={setSettingsOpen} />;
+    return <Settings db={dbRef.current} setOpen={setSettingsOpen} />;
   } else if (webview.label === "app_bar") {
     return (
       <AppBar
