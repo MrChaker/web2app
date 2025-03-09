@@ -11,6 +11,9 @@
     "keygen:allow-get-license",
     "keygen:allow-get-license-key",
     "core:webview:allow-webview-show",
-    "core:webview:allow-webview-hide"
+    "core:webview:allow-webview-hide",
+    "sql:default",
+    "sql:allow-execute",
+    "sql:allow-select"
   ]
 }

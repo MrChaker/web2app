@@ -26,5 +26,11 @@ pub fn get_migrations() -> Vec<Migration> {
           sql: "ALTER TABLE downloads ADD COLUMN state TEXT DEFAULT starting;",
           kind: MigrationKind::Up,
       },
+      Migration {
+        version: 5,
+        description: "license_key",
+        sql: "CREATE TABLE license_key (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT);",
+        kind: MigrationKind::Up,
+      },
     ]
 }

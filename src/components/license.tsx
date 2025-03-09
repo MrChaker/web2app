@@ -1,33 +1,50 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import {
   getLicense,
-  getLicenseKey,
   KeygenError,
   KeygenLicense,
+  resetLicenseKey,
   validateKey,
 } from "tauri-plugin-keygen-api";
+import { Database } from "../global";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 const License = () => {
   // license validation logic
-  const params = new URLSearchParams(location.search);
-  const cachedKey = params.get("cachedKey");
 
-  const [key, setKey] = useState(cachedKey || "");
+  const [key, setKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const appWindow = (window as any).__TAURI__.window.getCurrentWindow();
+  const sql: Database = (window as any).__TAURI__.sql;
+  const dbRef = useRef<Database | null>(null);
+
+  const initialize = async () => {
+    try {
+      const db = await sql.load(
+        "sqlite:test-encryption.db",
+        import.meta.env.VITE_DATABASE_KEY
+      );
+      dbRef.current = db;
+      setKey((await getLicenseKey(db)) || "");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const beforeLoad = async () => {
     let license = await getLicense();
-    let licenseKey = await getLicenseKey();
 
     if (license === null) {
-      setKey(licenseKey || "");
+      setKey(key);
     } else {
       invoke("show_container_window");
+      appWindow.emit("licensed");
     }
   };
   useEffect(() => {
+    initialize();
     beforeLoad();
   }, []);
 
@@ -47,9 +64,14 @@ const License = () => {
       return;
     }
 
+    // remove license key from cache
+    await resetLicenseKey();
+    // store it in db
+    if (dbRef.current) await putLicenseKey(dbRef.current, license.key);
     // check license
     if (license.valid) {
       invoke("show_container_window");
+      appWindow.emit("licensed");
     } else {
       setErr(`${license.code}: ${license.detail}`);
     }
@@ -71,6 +93,16 @@ const License = () => {
       {err !== "" && <div style={{ color: "#ef0222" }}>{err}</div>}
     </div>
   );
+};
+
+const getLicenseKey = async (db: Database): Promise<string> => {
+  const key: { key: string }[] = await db.select("SELECT * FROM license_key");
+  return key?.[0]?.key || "";
+};
+
+const putLicenseKey = async (db: Database, key: string): Promise<void> => {
+  await db.execute("DELETE FROM license_key WHERE id = 1");
+  await db.execute("INSERT INTO license_key (key) VALUES ($1)", [key]);
 };
 
 export default License;

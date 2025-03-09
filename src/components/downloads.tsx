@@ -1,13 +1,5 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  Dispatch,
-  SetStateAction,
-} from "react";
-import { getCurrentWindow, getAllWindows } from "@tauri-apps/api/window";
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import { invoke } from "@tauri-apps/api/core";
-// import Database from "@tauri-apps/plugin-sql";
 import {
   durationPastFromDate,
   formatFileSize,
@@ -16,7 +8,7 @@ import {
 import { CircleXIcon, FileIcon, FolderIcon } from "lucide-react";
 import * as shell from "@tauri-apps/plugin-shell";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
-import { UnlistenFn } from "@tauri-apps/api/event";
+import { Database } from "../global";
 
 enum State {
   starting = "starting",
@@ -36,12 +28,6 @@ type DownloadType = {
   state: State;
   created_at: string;
 };
-
-interface Database {
-  load: (url: string, key: string) => Promise<Database>;
-  execute: (query: string, params?: any[]) => Promise<{ lastInsertId: number }>;
-  select: (query: string) => Promise<any>;
-}
 
 const DownloadsManager = ({
   setOpen,

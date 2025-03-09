@@ -55,12 +55,17 @@ const Settings = ({
 
 const LicenseInfo = () => {
   const [license, setLicense] = useState<KeygenLicense | null>();
+  const webview = getCurrentWebview();
   const fetchLicense = async () => {
     const l = await getLicense();
     setLicense(l);
   };
   useEffect(() => {
     fetchLicense();
+
+    webview.listen("licensed", () => {
+      fetchLicense();
+    });
   }, []);
 
   return (
