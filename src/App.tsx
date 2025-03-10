@@ -20,6 +20,7 @@ function App() {
   const sql: Database = (window as any).__TAURI__.sql;
   const appWindow = getCurrentWindow();
   const dbRef = useRef<Database | null>(null);
+  const [db, setDb] = useState<Database | null>(null);
 
   const [downloadsOpen, setDownloadsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -55,7 +56,7 @@ function App() {
     }
 
     let license = await validateKey({
-      key: await getLicenseKey(dbRef.current!),
+      key: await getLicenseKey(db!),
     });
     let expired = license?.expiry && new Date(license?.expiry) <= new Date();
     let machineId =
@@ -67,7 +68,7 @@ function App() {
         license?.key!,
         machineId
       ).then(async () => {
-        showLicenseFrom(dbRef.current);
+        showLicenseFrom(db);
       });
     }
   };
@@ -77,9 +78,8 @@ function App() {
         "sqlite:test-encryption.db",
         import.meta.env.VITE_DATABASE_KEY
       );
-      console.log(db);
 
-      dbRef.current = db;
+      setDb(db);
     } catch (err) {
       console.error(err);
     }
@@ -87,7 +87,6 @@ function App() {
 
   useEffect(() => {
     initializeDb().then(() => {
-      console.log("first");
       checkLicense();
     });
 
@@ -131,17 +130,17 @@ function App() {
   }, [settingsOpen]);
 
   if (webview.label === "main") {
-    return <License db={dbRef.current} />;
+    return <License db={db} />;
   } else if (webview.label === "downloads") {
     document.body.style.maxHeight = "501px";
     document.body.style.overflow = "hidden";
 
-    return <DownloadsManager db={dbRef.current} setOpen={setDownloadsOpen} />;
+    return <DownloadsManager db={db} setOpen={setDownloadsOpen} />;
   } else if (webview.label === "settings") {
     document.body.style.maxHeight = "300px";
     document.body.style.overflow = "hidden";
 
-    return <Settings db={dbRef.current} setOpen={setSettingsOpen} />;
+    return <Settings db={db} setOpen={setSettingsOpen} />;
   } else if (webview.label === "app_bar") {
     return (
       <AppBar
