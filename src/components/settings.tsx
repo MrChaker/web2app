@@ -74,7 +74,7 @@ const LicenseInfo = ({ db }: { db: Database | null }) => {
   const heartbeat = () => {
     const clearInterval = setInterval(() => {
       pingHeartbeat((license as any).id, license?.key!);
-    }, import.meta.env.VITE_HEARTBEAT_INTERVAL * 60 * 1000 - 20000); // ping before 20 seconds of end
+    }, import.meta.env.VITE_HEARTBEAT_INTERVAL * 1000 - 10000); // ping before 10 seconds of end
     return clearInterval;
   };
 
