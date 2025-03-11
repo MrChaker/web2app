@@ -173,6 +173,8 @@ button {
 }
 #settings-list {
   padding: 1rem 1.5rem;
+  max-height: 235px;
+  overflow-y: auto;
 }
 
 .file-row {

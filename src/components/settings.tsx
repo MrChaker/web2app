@@ -64,6 +64,7 @@ const Settings = ({
 
 const LicenseInfo = ({ db }: { db: Database | null }) => {
   const [license, setLicense] = useState<KeygenLicense | null>();
+  const [err, setErr] = useState("");
 
   const webview = getCurrentWebview();
   const fetchLicense = async () => {
@@ -72,9 +73,15 @@ const LicenseInfo = ({ db }: { db: Database | null }) => {
   };
 
   const heartbeat = () => {
-    const clearInterval = setInterval(() => {
-      pingHeartbeat((license as any).id, license?.key!);
-    }, import.meta.env.VITE_HEARTBEAT_INTERVAL * 1000 - 10000); // ping before 10 seconds of end
+    const clearInterval = setInterval(async () => {
+      try {
+        const res = await pingHeartbeat((license as any).id, license?.key!);
+        if (!res.ok) throw new Error(res.status + " " + res.statusText);
+        setErr("");
+      } catch (error: any) {
+        setErr((error.message as string) || "Error");
+      }
+    }, 20 * 1000 - 10000); // ping before 10 seconds of end
     return clearInterval;
   };
 
@@ -123,6 +130,7 @@ const LicenseInfo = ({ db }: { db: Database | null }) => {
         }}>
         De-activate license
       </div>
+      {err && <p style={{ color: "red" }}>{err}</p>}
     </div>
   );
 };

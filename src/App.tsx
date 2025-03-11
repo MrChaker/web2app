@@ -135,7 +135,7 @@ function App() {
 
     return <DownloadsManager db={db} setOpen={setDownloadsOpen} />;
   } else if (webview.label === "settings") {
-    document.body.style.maxHeight = "300px";
+    document.body.style.maxHeight = "320px";
     document.body.style.overflow = "hidden";
 
     return <Settings db={db} setOpen={setSettingsOpen} />;
