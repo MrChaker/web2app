@@ -64,12 +64,20 @@ const DownloadsManager = ({
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (!db) return;
+  //   const initialize = async () => {
+  //     await cancelAllDownloadsInProgress(db);
+  //     loadDownloads(db);
+  //   };
+  //   initialize();
+  // }, [db]);
+
   useEffect(() => {
+    if (!db) return;
     const initialize = async () => {
-      if (db) {
-        await cancelAllDownloadsInProgress(db);
-        loadDownloads(db);
-      }
+      await cancelAllDownloadsInProgress(db);
+      loadDownloads(db);
     };
     initialize();
 
@@ -105,7 +113,7 @@ const DownloadsManager = ({
 
   const handleDownloadStarted = async (event: any) => {
     setOpen(true);
-
+    console.log(event.payload);
     const id = await addDownload(db!, event.payload);
     await loadDownloads(db!);
     invoke("download_file", {
@@ -170,6 +178,7 @@ const DownloadRow = ({
   download: DownloadType;
   db: Database | null;
 }) => {
+  const [canceled, setCanceled] = useState(download.state == State.canceled);
   const handleOpenFile = () => {
     if (download.state === State.finished) {
       shell.open(download.output_path);
@@ -182,14 +191,15 @@ const DownloadRow = ({
   };
 
   const handleCancel = async () => {
-    await invoke("cancel_download", {
+    invoke("cancel_download", {
       params: { id: String(download.id) },
     });
     await updateDownload(db!, { id: download.id, state: State.canceled });
+    setCanceled(true);
     // window.dispatchUpdate();
   };
 
-  const inProgress = download.state === State.in_progress;
+  const inProgress = download.state === State.in_progress && !canceled;
   const failed = download.state === State.failed;
 
   return (
@@ -219,6 +229,7 @@ const DownloadRow = ({
   );
 
   function renderActions() {
+    if (canceled) return <p>Canceled</p>;
     switch (download.state) {
       case State.in_progress:
         return (
@@ -276,6 +287,7 @@ const updateDownload = async (
   db: Database,
   payload: Partial<DownloadType>
 ): Promise<void> => {
+  console.log(db);
   let sqlString = "UPDATE downloads SET ";
   let payloadKeys = Object.keys(payload).filter((key) => key !== "id");
   payloadKeys.forEach((key, i) => {
