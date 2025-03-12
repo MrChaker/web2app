@@ -24,6 +24,11 @@ struct DownloadProgressPayload {
     id: String,
     progress: u64,
     file_size: u64,
+}
+
+#[derive(serde::Serialize, Clone)]
+struct DownloadUpdatePayload {
+    id: String,
     file_name: String,
     output_path: String,
 }
@@ -111,6 +116,14 @@ pub async fn download_file(app: AppHandle, params: DownloadFileParams) {
                 override_file_name = get_filename_from_url(override_output_path.clone());
 
                 std::fs::rename(&params.output_path, &override_output_path).unwrap();
+                let _ = app.emit(
+                    "download-update",
+                    DownloadUpdatePayload {
+                        id: params.id.clone(),
+                        file_name: override_file_name,
+                        output_path: override_output_path,
+                    },
+                );
             }
         }
     }
@@ -139,8 +152,6 @@ pub async fn download_file(app: AppHandle, params: DownloadFileParams) {
                     } else {
                         total_size
                     },
-                    file_name: override_file_name.clone(),
-                    output_path: override_output_path.clone(),
                 },
             );
             start_time = std::time::Instant::now();

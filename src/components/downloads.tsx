@@ -64,15 +64,6 @@ const DownloadsManager = ({
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (!db) return;
-  //   const initialize = async () => {
-  //     await cancelAllDownloadsInProgress(db);
-  //     loadDownloads(db);
-  //   };
-  //   initialize();
-  // }, [db]);
-
   useEffect(() => {
     if (!db) return;
     const initialize = async () => {
@@ -86,23 +77,15 @@ const DownloadsManager = ({
         setOpen(true);
       }),
       webview.listen("download-started", handleDownloadStarted),
+      webview.listen("download-update", handleDownloadUpdate),
       webview.listen("download-progress", handleDownloadProgress),
       webview.listen("download-success", handleDownloadSuccess),
       webview.listen("download-failed", handleDownloadFailed),
       webview.listen("close_download_window", () => setOpen(false)),
     ];
 
-    // Click outside handler
-    const handleClickOutside = (event: any) => {
-      if (windowRef.current && !windowRef.current.contains(event.target)) {
-        // setOpen(false);
-      }
-    };
-    document.addEventListener("click", handleClickOutside);
-
     return () => {
       listeners.forEach(async (unlisten) => await unlisten);
-      document.removeEventListener("click", handleClickOutside);
     };
   }, [db]);
 
@@ -113,7 +96,6 @@ const DownloadsManager = ({
 
   const handleDownloadStarted = async (event: any) => {
     setOpen(true);
-    console.log(event.payload);
     const id = await addDownload(db!, event.payload);
     await loadDownloads(db!);
     invoke("download_file", {
@@ -123,6 +105,13 @@ const DownloadsManager = ({
         output_path: event.payload.output_path,
       },
     });
+  };
+
+  const handleDownloadUpdate = async (event: any) => {
+    await updateDownload(db!, {
+      ...event.payload,
+    });
+    loadDownloads(db!);
   };
 
   const handleDownloadProgress = async (event: any) => {
@@ -287,7 +276,6 @@ const updateDownload = async (
   db: Database,
   payload: Partial<DownloadType>
 ): Promise<void> => {
-  console.log(db);
   let sqlString = "UPDATE downloads SET ";
   let payloadKeys = Object.keys(payload).filter((key) => key !== "id");
   payloadKeys.forEach((key, i) => {
