@@ -81,7 +81,7 @@ const LicenseInfo = ({ db }: { db: Database | null }) => {
       } catch (error: any) {
         setErr((error.message as string) || "Error");
       }
-    }, 20 * 1000 - 10000); // ping before 10 seconds of end
+    }, import.meta.env.VITE_HEARTBEAT_INTERVAL * 60 * 1000 - 10000); // ping before 10 seconds of end
     return clearInterval;
   };
 
