@@ -45,9 +45,12 @@ const AppBar = ({
       id="appbar"
       style={{ height: barHeight }}
       data-tauri-drag-region={true}>
-      <div className="title">
+      <div data-tauri-drag-region={true} className="title">
         {(window as any).config.icon && (
-          <img src={(window as any).config.icon} />
+          <img
+            data-tauri-drag-region={true}
+            src={(window as any).config.icon}
+          />
         )}
         {(window as any).config.app_name}
       </div>
