@@ -49,13 +49,9 @@ const License = ({ db }: { db: Database | null }) => {
       return;
     }
 
-    // // remove license key from cache
-    // await resetLicenseKey();
-
-    // store it in db
-    if (db) await putLicenseKey(db, license.key);
     // check license
     if (license.valid) {
+      if (db) await putLicenseKey(db, license.key);
       invoke("show_container_window");
       appWindow.emit("licensed");
       return;
@@ -64,6 +60,7 @@ const License = ({ db }: { db: Database | null }) => {
       await pingHeartbeat((license as any).id, license.key)
         .then(async () => {
           await validateKey({ key }); // validate again to update
+          if (db) await putLicenseKey(db, license.key);
           invoke("show_container_window");
           appWindow.emit("licensed");
         })

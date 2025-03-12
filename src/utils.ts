@@ -83,7 +83,7 @@ export const getLicenseMachine = async (id: string, key: string) => {
     }
   );
   const { data: machines } = await res.json();
-  return machines[0].id;
+  return machines?.[0]?.id;
 };
 
 export const deactivateMachine = async (
@@ -118,7 +118,7 @@ export const pingHeartbeat = async (
   // get machine
   machineId = machineId || (await getLicenseMachine(id, key));
 
-  await fetch(
+  return await fetch(
     `https://api.keygen.sh/v1/accounts/${
       import.meta.env.VITE_KEYGEN_ACCOUNT_ID
     }/machines/${machineId}/actions/ping`,

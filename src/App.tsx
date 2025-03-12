@@ -56,25 +56,23 @@ function App() {
   };
 
   const checkLicense = async (db: Database) => {
-    if (webview.label === "main") {
-      return;
-    }
-
-    let license = await validateKey({
-      key: await getLicenseKey(db!),
-    });
-    let expired = license?.expiry && new Date(license?.expiry) <= new Date();
-    let machineId =
-      license && (await getLicenseMachine((license as any).id, license.key));
-
-    if (!license?.valid || expired || !machineId) {
-      await deactivateMachine(
-        (license as any).id,
-        license?.key!,
-        machineId
-      ).then(async () => {
-        showLicenseFrom(db);
+    if (webview.label === "container") {
+      let license = await validateKey({
+        key: await getLicenseKey(db!),
       });
+      let expired = license?.expiry && new Date(license?.expiry) <= new Date();
+      let machineId =
+        license && (await getLicenseMachine((license as any).id, license.key));
+
+      if (!license?.valid || expired || !machineId) {
+        await deactivateMachine(
+          (license as any).id,
+          license?.key!,
+          machineId
+        ).then(async () => {
+          showLicenseFrom(db);
+        });
+      }
     }
   };
   const initializeDb = async () => {
@@ -92,7 +90,6 @@ function App() {
 
   useEffect(() => {
     initializeDb().then((db) => {
-      console.log(db);
       checkLicense(db!);
     });
 
@@ -147,7 +144,7 @@ function App() {
 
     return <DownloadsManager db={db} setOpen={setDownloadsOpen} />;
   } else if (webview.label === "settings") {
-    document.body.style.maxHeight = "300px";
+    document.body.style.maxHeight = "320px";
     document.body.style.overflow = "hidden";
 
     return <Settings db={db} setOpen={setSettingsOpen} />;
