@@ -12,7 +12,12 @@ import {
   PhysicalSize,
 } from "@tauri-apps/api/window";
 import { resetLicense, validateKey } from "tauri-plugin-keygen-api";
-import { deactivateMachine, getLicenseMachine, showLicenseFrom } from "./utils";
+import {
+  deactivateMachine,
+  getLicenseMachine,
+  onMacOnWindows,
+  showLicenseFrom,
+} from "./utils";
 import { Database } from "./global";
 
 function App() {
@@ -50,7 +55,7 @@ function App() {
     webview.emit("settings_toggled", settingsOpen);
   };
 
-  const checkLicense = async () => {
+  const checkLicense = async (db: Database) => {
     if (webview.label === "main") {
       return;
     }
@@ -78,26 +83,31 @@ function App() {
         "sqlite:test-encryption.db",
         import.meta.env.VITE_DATABASE_KEY
       );
-
       setDb(db);
+      return db;
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    initializeDb().then(() => {
-      checkLicense();
+    initializeDb().then((db) => {
+      console.log(db);
+      checkLicense(db!);
     });
 
     if (appWindow.label === "container") {
       appWindow.onResized(async ({ payload: size }) => {
         let pos = await webview.position();
         if (webview.label === "downloads") {
-          webview.setPosition(new PhysicalPosition(size.width - 1000, pos.y));
+          webview.setPosition(
+            new PhysicalPosition(size.width - onMacOnWindows(1000, 650), pos.y)
+          );
         }
         if (webview.label === "settings") {
-          webview.setPosition(new PhysicalPosition(size.width - 600, pos.y));
+          webview.setPosition(
+            new PhysicalPosition(size.width - onMacOnWindows(600, 250), pos.y)
+          );
         }
 
         if (webview.label === "app_bar") {

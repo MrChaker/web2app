@@ -147,3 +147,11 @@ export const showLicenseFrom = async (db: Database | null) => {
 const deleteLicenseKey = async (db: Database | null): Promise<void> => {
   if (db) await db.execute("DELETE FROM license_key WHERE id = 1");
 };
+
+export const onMacOnWindows = (mac: any, windows: any) => {
+  if (navigator.platform.includes("Mac")) {
+    return mac;
+  } else {
+    return windows;
+  }
+};
