@@ -29,6 +29,14 @@ const License = ({ db }: { db: Database | null }) => {
     appWindow.emit("licensed");
     return;
   };
+
+  useEffect(() => {
+    const savedKey = async () => {
+      if (db) setKey(await getLicenseKey(db));
+    };
+    savedKey();
+  }, [db]);
+
   useEffect(() => {
     beforeLoad();
   }, []);

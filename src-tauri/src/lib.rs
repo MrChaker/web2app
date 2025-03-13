@@ -33,6 +33,7 @@ pub fn run() {
             tauri_plugin_keygen::Builder::new(
                 env::var("KEYGEN_ACCOUNT_ID").unwrap(),
                 env::var("KEYGEN_VERIFY_KEY").unwrap(),
+                "test-encryption.db",
             )
             .build(),
         )
