@@ -62,6 +62,7 @@ const License = ({ db }: { db: Database | null }) => {
       if (db) await putLicenseKey(db, license.key);
       invoke("show_container_window");
       appWindow.emit("licensed");
+      setLoading(false);
       return;
     }
     if (license.code === "HEARTBEAT_NOT_STARTED") {

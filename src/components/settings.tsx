@@ -73,16 +73,22 @@ const LicenseInfo = ({ db }: { db: Database | null }) => {
   };
 
   const heartbeat = () => {
-    const clearInterval = setInterval(async () => {
+    const trigger = async (ci: number | undefined = undefined) => {
       try {
         const res = await pingHeartbeat((license as any).id, license?.key!);
         if (!res.ok) throw new Error(res.status + " " + res.statusText);
         setErr("");
       } catch (error: any) {
         setErr((error.message as string) || "Error");
+        if (ci) clearInterval(ci);
+        showLicenseFrom(db);
       }
+    };
+    trigger();
+    const ci = setInterval(async () => {
+      trigger(ci);
     }, import.meta.env.VITE_HEARTBEAT_INTERVAL * 1000 - 10000); // ping before 10 seconds of end
-    return clearInterval;
+    return ci;
   };
 
   useEffect(() => {
@@ -92,7 +98,7 @@ const LicenseInfo = ({ db }: { db: Database | null }) => {
     return () => {
       clearInterval(interval);
     };
-  }, [license]);
+  }, [license, db]);
 
   useEffect(() => {
     fetchLicense();
