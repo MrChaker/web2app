@@ -1,0 +1,12 @@
+/.vs
+.DS_Store
+.Thumbs.db
+*.sublime*
+.idea/
+debug.log
+.vscode/settings.json
+
+node_modules/
+
+# rust compiled folders
+target/

@@ -1,0 +1,10 @@
+{
+  "tag": "rc",
+  "changes": [
+    ".changes/geolocation-release.md",
+    ".changes/haptics-release.md",
+    ".changes/rc.md",
+    ".changes/shell-open-regex-match-string.md",
+    ".changes/shell-regex-match-string.md"
+  ]
+}

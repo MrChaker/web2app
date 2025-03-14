@@ -19,12 +19,14 @@ import {
   showLicenseFrom,
 } from "./utils";
 import { Database } from "./global";
+import { invoke } from "@tauri-apps/api/core";
 
 function App() {
   const webview = getCurrentWebview();
+
   const sql: Database = (window as any).__TAURI__.sql;
+
   const appWindow = getCurrentWindow();
-  const dbRef = useRef<Database | null>(null);
   const [db, setDb] = useState<Database | null>(null);
 
   const [downloadsOpen, setDownloadsOpen] = useState(false);
@@ -77,17 +79,19 @@ function App() {
   };
   const initializeDb = async () => {
     try {
-      const db = await sql.load(
-        "sqlite:test-encryption.db",
-        import.meta.env.VITE_DATABASE_KEY
-      );
-      setDb(db);
+      const _path = await invoke<string>("plugin:sql|load_with_options", {
+        params: {
+          db: "sqlite:test-encryption.db",
+          encryption_key: import.meta.env.VITE_DATABASE_KEY,
+        },
+      });
+
+      setDb(new (sql as any)(_path));
       return db;
     } catch (err) {
       console.error(err);
     }
   };
-
   useEffect(() => {
     initializeDb().then((db) => {
       checkLicense(db!);

@@ -27,11 +27,10 @@ tauri-plugin-http = "2.2.0"
 sqlx = { version = "0.8", features = [ "runtime-async-std" ] }
 async-std =  { version = "1.10", features = [ "attributes" ] }
 tauri-plugin-shell = "2.2.0"
-tauri-plugin-keygen = { git = "https://github.com/MrChaker/tauri-plugin-keygen", branch = "v2" }
+tauri-plugin-keygen = { path = "./tauri-plugin-keygen" }
 dotenv = "0.15"
 
 [dependencies.tauri-plugin-sql]
 features = ["bundled-sqlcipher"]
 version =  "2.0.0-rc.0"
-git = "https://github.com/MrChaker/plugins-workspace"
-branch = "sql/sqlcipher-load-with-key"
+path = "./plugins-workspace/plugins/sql"

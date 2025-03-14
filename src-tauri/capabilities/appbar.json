@@ -24,6 +24,7 @@
 
     "core:event:default",
     "sql:default",
+    "sql:allow-load-with-options",
     "sql:allow-execute",
     "sql:allow-select",
     "shell:allow-open",
