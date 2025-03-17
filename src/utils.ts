@@ -1,6 +1,7 @@
 import { resetLicense } from "tauri-plugin-keygen-api";
 import { Database } from "./global";
 import { getAllWindows } from "@tauri-apps/api/window";
+import { TrayIcon } from "@tauri-apps/api/tray";
 
 export const durationPastFromDate = (date: string | number | Date): string => {
   const now = new Date();
@@ -140,6 +141,8 @@ export const showLicenseFrom = async (db: Database | null) => {
   const mainWindow = allWindows.find((w) => w.label == "main");
   const appWindow = allWindows.find((w) => w.label == "container");
 
+  const trayIcon = await TrayIcon.getById("app-tray");
+  trayIcon?.setVisible(false);
   mainWindow?.show();
   appWindow?.hide();
 };

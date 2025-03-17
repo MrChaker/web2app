@@ -32,5 +32,27 @@ pub fn get_migrations() -> Vec<Migration> {
         sql: "CREATE TABLE license_key (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT);",
         kind: MigrationKind::Up,
       },
+      Migration {
+        version: 6,
+        description: "autostart", // not used
+        sql: "CREATE TABLE auto_start (has_been_set TEXT);",
+        kind: MigrationKind::Up,
+      },
+      Migration {
+        version: 7,
+        description: "settings",
+        sql: "CREATE TABLE settings (id INTEGER PRIMARY KEY AUTOINCREMENT, option TEXT, value TEXT);",
+        kind: MigrationKind::Up,
+      },
+      Migration {
+        version: 8,
+        description: "settings_defaults",
+        sql: r#"
+        INSERT INTO settings (option, value) values ("auto_start", "true");
+        INSERT INTO settings (option, value) values ("close_tray", "false");
+        INSERT INTO settings (option, value) values ("minimize_tray", "false");
+        "#,
+        kind: MigrationKind::Up,
+      }
     ]
 }
