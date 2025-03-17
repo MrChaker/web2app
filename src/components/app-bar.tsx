@@ -76,12 +76,16 @@ const AppBar = ({
           </div>
         </div>
         <div className="window-controls">
-          <button onClick={() => appWindow.minimize()}>
+          <button
+            onClick={async () => {
+              await appWindow.setFullscreen(false);
+              appWindow.minimize();
+            }}>
             <Minus />
           </button>
           <button
-            onClick={() => {
-              appWindow.toggleMaximize();
+            onClick={async () => {
+              appWindow.setFullscreen(!(await appWindow.isFullscreen()));
               setIsMaximized((prev) => !prev);
             }}>
             {isMaximized ? <Minimize /> : <Maximize />}
