@@ -12,6 +12,7 @@ use migrations::get_migrations;
 use std::env;
 use std::sync::Mutex;
 use tauri::Manager;
+use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_sql::SqliteConnectOptions;
 use window::build_window;
 
@@ -22,7 +23,10 @@ pub struct AppState {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let app = tauri::Builder::default();
+    let app = tauri::Builder::default().plugin(tauri_plugin_autostart::init(
+        MacosLauncher::LaunchAgent,
+        None,
+    ));
     let _ = dotenv().expect("Failed to load .env file");
     let db_key = env::var("DATABASE_KEY").expect("DATABASE_KEY not found");
 

@@ -15,6 +15,7 @@ import {
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getAllWindows } from "@tauri-apps/api/window";
 import { Database } from "../global";
+import { enable, isEnabled, disable } from "@tauri-apps/plugin-autostart";
 
 const Settings = ({
   setOpen,
@@ -55,8 +56,39 @@ const Settings = ({
       <h3>
         Settings <CircleX onClick={() => setOpen(false)} />{" "}
       </h3>
+
       <div id="settings-list">
+        <SystemSettings />
         <LicenseInfo db={db} />
+      </div>
+    </div>
+  );
+};
+
+const SystemSettings = () => {
+  const [autoStart, setAutoStart] = useState(false);
+
+  const initIsEnabled = async () => setAutoStart(await isEnabled());
+
+  useEffect(() => {
+    initIsEnabled();
+  }, []);
+
+  return (
+    <div style={{ textAlign: "center", margin: "1rem 0" }}>
+      <h4>---- System settings ----</h4>
+      <div style={{ fontWeight: "bold" }}>
+        <input
+          type="checkbox"
+          style={{ marginRight: "0.5rem" }}
+          checked={autoStart}
+          onChange={async (e) => {
+            if (autoStart) disable();
+            else enable();
+            setAutoStart(e.target.checked);
+          }}
+        />
+        Auto start Enabled
       </div>
     </div>
   );
@@ -109,7 +141,7 @@ const LicenseInfo = ({ db }: { db: Database | null }) => {
 
   return (
     <div style={{ textAlign: "center", margin: "1rem 0" }}>
-      <h4>-- License --</h4>
+      <h4>----- License -----</h4>
       <p>
         <span style={{ fontWeight: "bold" }}>Status:</span>{" "}
         {license?.valid ? "🟢" : "🔴"}

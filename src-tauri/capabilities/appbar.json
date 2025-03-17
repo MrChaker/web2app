@@ -34,6 +34,10 @@
     "core:window:allow-set-size",
     "core:window:allow-set-position",
     "keygen:allow-validate-key",
-    "keygen:allow-activate"
+    "keygen:allow-activate",
+    "autostart:default",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled"
   ]
 }
