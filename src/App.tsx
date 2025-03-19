@@ -3,15 +3,14 @@ import AppBar from "./components/app-bar";
 import License, { getLicenseKey } from "./components/license";
 import DownloadsManager from "./components/downloads";
 import { getAllWebviews, getCurrentWebview } from "@tauri-apps/api/webview";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Settings from "./components/settings";
 import {
-  getAllWindows,
   getCurrentWindow,
   PhysicalPosition,
   PhysicalSize,
 } from "@tauri-apps/api/window";
-import { resetLicense, validateKey } from "tauri-plugin-keygen-api";
+import { validateKey } from "tauri-plugin-keygen-api";
 import {
   deactivateMachine,
   getLicenseMachine,

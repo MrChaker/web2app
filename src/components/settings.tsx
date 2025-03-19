@@ -1,9 +1,8 @@
 import { CircleX } from "lucide-react";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   formatTimeStringToDate,
   deactivateMachine,
-  getLicenseMachine,
   pingHeartbeat,
   showLicenseFrom,
 } from "../utils";
