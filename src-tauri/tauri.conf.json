@@ -24,6 +24,7 @@
     }
   },
   "bundle": {
+    "createUpdaterArtifacts": true,
     "active": true,
     "targets": "all",
     "icon": [
@@ -34,5 +35,17 @@
       "icons/icon.ico"
     ],
     "resources": ["libcrypto-3-x64.dll"]
+  },
+  "plugins": {
+    "updater": {
+      "createUpdaterArtifacts": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQyNTU1Nzk2RjBEMTg0REUKUldUZWhOSHdsbGRWMHJUeU9hWjhWNXg4QXQ0YUhpOCs3QTNsVjk3Z0hEczVvTDhZR0grMnNzVGMK%",
+      "endpoints": [
+        "https://gist.githubusercontent.com/MrChaker/fe2c7c794662f37c6a006126768b27aa/raw/updater.json"
+      ],
+      "windows": {
+        "installMode": "basicUi"
+      }
+    }
   }
 }
