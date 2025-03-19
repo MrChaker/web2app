@@ -65,24 +65,10 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
 
-  # updater:
-  #   needs: publish-tauri
-  #   permissions:
-  #     contents: write
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       include:
-  #         - platform: "macos-latest" # for Arm based macs (M1 and above).
-  #           args: "--target aarch64-apple-darwin"
-  #         - platform: "macos-latest" # for Intel based macs.
-  #           args: "--target x86_64-apple-darwin"
-  #         - platform: "ubuntu-22.04"
-  #           args: ""
-  #         - platform: "windows-latest"
-  #           args: ""
-
-  #   runs-on: ${{ matrix.platform }}
-  #   steps:
-  #     - name: "Update updater json"
-  #       run: |
+      - name: Run action
+        uses: andrewthetechie/gha-clone-releases@v1.7.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          src_repo: oomaxu/web2app
+          dest_repo: MrChaker/upcount-updater
+          copy_assets: true
