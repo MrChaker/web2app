@@ -65,6 +65,10 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
 
+  clone-release:
+    needs: publish-tauri
+    runs-on: "ubuntu-22.04"
+    steps:
       - name: Run action
         uses: andrewthetechie/gha-clone-releases@v1.7.0
         with:
