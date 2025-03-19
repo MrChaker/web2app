@@ -79,10 +79,12 @@ jobs:
     # needs: publish-tauri
     runs-on: "ubuntu-22.04"
     steps:
-      - name: Run action
-        uses: andrewthetechie/gha-clone-releases@v1.7.0
+      - name: Duplicate Release With Asset to public_Repo
+        id: Release-AIO
+        uses: Hs1r1us/Release-AIO@v2.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          src_repo: oomaxu/web2app
-          dest_repo: MrChaker/upcount-updater
-          copy_assets: true
+          tag_name: "inherit"
+          body: "hello world"
+          repo: "MrChaker/upcount-updater"
