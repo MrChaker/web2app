@@ -56,6 +56,10 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: choco install openssl
 
+      - name: Verify OpenSSL installation
+        run: |
+          dir "C:\Program Files\OpenSSL"
+
       - name: Set OPENSSL_DIR
         if: matrix.platform == 'windows-latest'
         run: |
