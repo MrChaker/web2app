@@ -1,0 +1,49 @@
+name: Handle All Release Events
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published, created]
+
+jobs:
+  update-latest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Update latest.json file
+        run: |
+          # Define the strings to replace (if needed)
+          s1="lab770/web2app"
+          s2="MrChaker/upcount-updater"
+
+          # Create a new file (e.g., new_latest.json)
+          echo '{"version": "${{ github.event.release.tag_name }}", "message": "This is a new file"}' > update.json
+
+          # Optionally, perform string replacement in the new file
+          sed -i "s/$s1/$s2/g" update.json
+
+      - name: Upload new file as a release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./update.json
+          asset_name: update.json
+          asset_content_type: application/json
+
+  clone-release:
+    needs: update-latest
+    runs-on: "ubuntu-22.04"
+    steps:
+      - name: Duplicate Release With Asset to public_Repo
+        id: Release-AIO
+        uses: Hs1r1us/Release-AIO@v2.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.DIST_REPO_TOKEN }}
+        with:
+          tag_name: "inherit"
+          body: "hello world"
+          draft: false
+          repo: "MrChaker/upcount-updater"
