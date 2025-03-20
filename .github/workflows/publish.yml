@@ -95,4 +95,5 @@ jobs:
         with:
           tag_name: "inherit"
           body: "hello world"
+          prerelease: true
           repo: "MrChaker/upcount-updater"
