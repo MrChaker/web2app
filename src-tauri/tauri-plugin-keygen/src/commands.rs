@@ -24,8 +24,9 @@ pub async fn get_license_key<R: Runtime>(
     app: AppHandle<R>,
     _window: Window<R>,
     db_name: String,
+    db_key: String,
 ) -> Result<Option<String>> {
-    match LicensedState::get_cached_license_key(&app, db_name.as_str()).await {
+    match LicensedState::get_cached_license_key(&app, db_name.as_str(), db_key.as_str()).await {
         Ok(key) => Ok(key),
         Err(err) => {
             dbg!(&err);

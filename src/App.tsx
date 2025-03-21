@@ -16,6 +16,7 @@ import {
   getLicenseMachine,
   onMacOnWindows,
   showLicenseFrom,
+  updater,
 } from "./utils";
 import { Database } from "./global";
 import { invoke } from "@tauri-apps/api/core";
@@ -81,7 +82,7 @@ function App() {
       const _path = await invoke<string>("plugin:sql|load_with_options", {
         params: {
           db: "sqlite:test-encryption.db",
-          encryption_key: import.meta.env.VITE_DATABASE_KEY,
+          encryption_key: await invoke("get_env", { name: "DATABASE_KEY" }),
         },
       });
 
@@ -91,6 +92,7 @@ function App() {
       console.error(err);
     }
   };
+
   useEffect(() => {
     initializeDb().then((db) => {
       checkLicense(db!);
@@ -116,6 +118,13 @@ function App() {
         }
       });
     }
+
+    setTimeout(async () => {
+      if (!(await appWindow.isVisible())) return;
+      if (webview.label !== "main" && webview.label !== "app_bar") return;
+      // run only on opened window . if container is opened run only on app_bar
+      updater();
+    }, 2000);
 
     const unlisteners = [
       webview.listen("download_toggled", (event) => {

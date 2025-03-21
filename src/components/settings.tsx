@@ -12,6 +12,7 @@ import { Database } from "../global";
 import { enable, disable } from "@tauri-apps/plugin-autostart";
 import { TrayIcon } from "@tauri-apps/api/tray";
 import { setUpTray } from "./tray-menu";
+import { invoke } from "@tauri-apps/api/core";
 
 const Settings = ({
   setOpen,
@@ -180,7 +181,7 @@ const LicenseInfo = ({ db }: { db: Database | null }) => {
     setLicense(l);
   };
 
-  const heartbeat = () => {
+  const heartbeat = async () => {
     const trigger = async (ci: number | undefined = undefined) => {
       try {
         const res = await pingHeartbeat((license as any).id, license?.key!);
@@ -193,16 +194,22 @@ const LicenseInfo = ({ db }: { db: Database | null }) => {
       }
     };
     trigger();
+    let intervalDuration =
+      Number(await invoke("get_env", { name: "HEARTBEAT_INTERVAL" })) || 60;
     const ci = setInterval(async () => {
       trigger(ci);
-    }, import.meta.env.VITE_HEARTBEAT_INTERVAL * 1000 - 10000); // ping before 10 seconds of end
+    }, intervalDuration * 1000 - 10000); // ping before 10 seconds of end
     return ci;
   };
 
   useEffect(() => {
     let interval: number;
-    if (license?.valid) interval = heartbeat();
-    else if (db) showLicenseFrom(db);
+    const init = async () => {
+      if (license?.valid) interval = await heartbeat();
+      else if (db) showLicenseFrom(db);
+    };
+
+    init();
     return () => {
       clearInterval(interval);
     };

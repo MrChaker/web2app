@@ -2,6 +2,9 @@ import { resetLicense } from "tauri-plugin-keygen-api";
 import { Database } from "./global";
 import { getAllWindows } from "@tauri-apps/api/window";
 import { TrayIcon } from "@tauri-apps/api/tray";
+import { relaunch } from "@tauri-apps/plugin-process";
+import { check } from "@tauri-apps/plugin-updater";
+import { invoke } from "@tauri-apps/api/core";
 
 export const durationPastFromDate = (date: string | number | Date): string => {
   const now = new Date();
@@ -68,12 +71,13 @@ export function getParentDirectory(path: string): string {
   return parentPath;
 }
 
+const keygenId = async () =>
+  await invoke("get_env", { name: "KEYGEN_ACCOUNT_ID" });
+
 export const getLicenseMachine = async (id: string, key: string) => {
   // get machine
   const res = await fetch(
-    `https://api.keygen.sh/v1/accounts/${
-      import.meta.env.VITE_KEYGEN_ACCOUNT_ID
-    }/licenses/${id}/machines`,
+    `https://api.keygen.sh/v1/accounts/${await keygenId()}/licenses/${id}/machines`,
     {
       method: "GET",
       headers: {
@@ -96,9 +100,7 @@ export const deactivateMachine = async (
   machineId = machineId || (await getLicenseMachine(id, key));
 
   const deleteRes = await fetch(
-    `https://api.keygen.sh/v1/accounts/${
-      import.meta.env.VITE_KEYGEN_ACCOUNT_ID
-    }/machines/${machineId}`,
+    `https://api.keygen.sh/v1/accounts/${await keygenId()}/machines/${machineId}`,
     {
       method: "DELETE",
       headers: {
@@ -120,9 +122,7 @@ export const pingHeartbeat = async (
   machineId = machineId || (await getLicenseMachine(id, key));
 
   return await fetch(
-    `https://api.keygen.sh/v1/accounts/${
-      import.meta.env.VITE_KEYGEN_ACCOUNT_ID
-    }/machines/${machineId}/actions/ping`,
+    `https://api.keygen.sh/v1/accounts/${await keygenId()}/machines/${machineId}/actions/ping`,
     {
       method: "POST",
       headers: {
@@ -156,5 +156,49 @@ export const onMacOnWindows = (mac: any, windows: any) => {
     return mac;
   } else {
     return windows;
+  }
+};
+
+export const updater = async () => {
+  const update = await check({
+    headers: {
+      Authorization:
+        "Bearer prod-d59bec7f5bd44da80bbdfedafddb55a219b240f371afbc2ed31a757c5e5834f0v3",
+    },
+  });
+  if (update) {
+    const install = await confirm(
+      "Found new version " + update.version + "\nDo you want to install ?"
+    );
+    if (install) {
+      let downloaded = 0;
+      let contentLength = 0;
+      // alternatively we could also call update.download() and update.install() separately
+      await update.downloadAndInstall((event) => {
+        switch (event.event) {
+          case "Started":
+            contentLength = event.data.contentLength || 0;
+            console.log(
+              `started downloading ${event.data.contentLength} bytes`
+            );
+            alert(
+              `Downloading new version ${formatFileSize(
+                contentLength
+              )} \nPlease wait ...`
+            );
+            break;
+          case "Progress":
+            downloaded += event.data.chunkLength;
+            console.log(`downloaded ${downloaded} from ${contentLength}`);
+            break;
+          case "Finished":
+            console.log("download finished");
+            break;
+        }
+      });
+
+      console.log("update installed");
+      await relaunch();
+    }
   }
 };

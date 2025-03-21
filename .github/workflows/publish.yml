@@ -70,11 +70,21 @@ jobs:
           echo "VCPKG_ROOT=$vcpkgRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "OPENSSL_DIR=$opensslDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Create .env file
+        run: |
+          echo "
+          DATABASE_KEY=${{ env.DATABASE_KEY }} \n
+          KEYGEN_ACCOUNT_ID=${{ env.KEYGEN_ACCOUNT_ID }} \n
+          KEYGEN_VERIFY_KEY=${{ env.KEYGEN_VERIFY_KEY }} \n
+          HEARTBEAT_INTERVAL=${{ env.HEARTBEAT_INTERVAL }}
+          " > .env
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
         with:
           tagName: app-v__VERSION__
           releaseName: "App v__VERSION__"

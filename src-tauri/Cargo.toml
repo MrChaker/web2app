@@ -29,6 +29,10 @@ async-std =  { version = "1.10", features = [ "attributes" ] }
 tauri-plugin-shell = "2.2.0"
 tauri-plugin-keygen = { path = "./tauri-plugin-keygen" }
 dotenv = "0.15"
+tauri-plugin-dialog = "2"
+tauri-plugin-process = "2"
+fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
+dotenvy_macro = "0.15.7"
 
 [dependencies.tauri-plugin-sql]
 features = ["bundled-sqlcipher"]
@@ -37,3 +41,4 @@ path = "./plugins-workspace/plugins/sql"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
+tauri-plugin-updater = "2"

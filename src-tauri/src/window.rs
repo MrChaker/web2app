@@ -2,7 +2,7 @@ use crate::download_manager::download_service::DownloadService;
 use serde::{Deserialize, Serialize};
 use std::{env, path::PathBuf, str::FromStr};
 use tauri::{
-    webview::DownloadEvent, window::Color, App, LogicalPosition, LogicalSize, WebviewUrl,
+    process, webview::DownloadEvent, window::Color, App, LogicalPosition, LogicalSize, WebviewUrl,
     WebviewWindow, WebviewWindowBuilder, Window,
 };
 
@@ -31,23 +31,25 @@ pub async fn build_window(app: &mut App) -> Window {
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
     };
 
-    let db_key = env::var("DATABASE_KEY").expect("DATABASE_KEY not found");
-
     let config_script = &format!(
         r#"
             window.config = {{
-                db_key: "{}",
                 app_name: "{}",
                 icon: "{}",
             }}
         "#,
-        db_key, app_config.name, app_config.icon
+        app_config.name, app_config.icon
     );
 
     let width = 1200.;
     let height = 800.;
     let app_bar_height = 38.0;
-    let react_url = WebviewUrl::App(PathBuf::from_str("http://localhost:1420").unwrap());
+
+    let react_url = if cfg!(debug_assertions) {
+        WebviewUrl::App(PathBuf::from_str("http://localhost:1420").unwrap())
+    } else {
+        WebviewUrl::App(PathBuf::from_str("./dist/index.html").unwrap())
+    };
 
     let container_window = tauri::window::WindowBuilder::new(app, "container")
         .inner_size(width, height)

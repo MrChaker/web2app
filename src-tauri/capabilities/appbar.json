@@ -42,6 +42,22 @@
     "autostart:allow-disable",
     "autostart:allow-is-enabled",
     "core:app:allow-default-window-icon",
-    "core:window:allow-destroy"
+    "core:window:allow-destroy",
+    "updater:default",
+    "updater:allow-check",
+    "updater:allow-download",
+    "updater:allow-install",
+    "updater:allow-download-and-install",
+    "dialog:allow-ask",
+    "dialog:allow-confirm",
+    "dialog:default",
+    "process:allow-exit",
+    "process:allow-restart",
+    {
+      "identifier": "http:default",
+      "allow": [{ "url": "https://api.keygen.sh" }]
+    },
+    "http:allow-fetch",
+    "http:default"
   ]
 }

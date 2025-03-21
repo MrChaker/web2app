@@ -25,6 +25,7 @@ pub struct Builder {
     pub version_header: Option<String>,
     pub cache_lifetime: i64, // in minutes
     pub db_name: String,
+    pub db_key: String,
 }
 
 impl Builder {
@@ -32,6 +33,7 @@ impl Builder {
         account_id: impl Into<String>,
         verify_key: impl Into<String>,
         db_name: impl Into<String>,
+        db_key: impl Into<String>,
     ) -> Self {
         Self {
             custom_domain: None,
@@ -41,6 +43,7 @@ impl Builder {
             version_header: None,
             cache_lifetime: 240,
             db_name: db_name.into(),
+            db_key: db_key.into(),
         }
     }
 
@@ -48,6 +51,7 @@ impl Builder {
         custom_domain: impl Into<String>,
         verify_key: impl Into<String>,
         db_name: impl Into<String>,
+        db_key: impl Into<String>,
     ) -> Self {
         Self {
             custom_domain: Some(custom_domain.into()),
@@ -57,6 +61,7 @@ impl Builder {
             version_header: None,
             cache_lifetime: 240,
             db_name: db_name.into(),
+            db_key: db_key.into(),
         }
     }
 
@@ -112,8 +117,14 @@ impl Builder {
 
                 // init state
                 tauri::async_runtime::block_on(async move {
-                    match LicensedState::load(app, &keygen_client, &machine, self.db_name.as_str())
-                        .await
+                    match LicensedState::load(
+                        app,
+                        &keygen_client,
+                        &machine,
+                        self.db_name.as_str(),
+                        self.db_key.as_str(),
+                    )
+                    .await
                     {
                         Ok(licensed_state) => {
                             app.manage(Mutex::new(licensed_state));

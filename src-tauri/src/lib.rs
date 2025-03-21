@@ -8,6 +8,7 @@ use crate::invoke::{
     download_file::download_file, show_container_window::show_container_window,
 };
 use dotenv::dotenv;
+use dotenvy_macro::dotenv;
 use migrations::get_migrations;
 use std::env;
 use std::sync::Mutex;
@@ -15,29 +16,46 @@ use tauri::Manager;
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_sql::SqliteConnectOptions;
 use window::build_window;
-
 #[derive(Default)]
 pub struct AppState {
     canceled_downloads: Vec<String>,
 }
 
+#[tauri::command]
+fn get_env(name: &str) -> String {
+    let res = match name {
+        // all vars needed by frontend
+        "HEARTBEAT_INTERVAL" => dotenv!("HEARTBEAT_INTERVAL"),
+        "KEYGEN_ACCOUNT_ID" => dotenv!("KEYGEN_ACCOUNT_ID"),
+        "DATABASE_KEY" => dotenv!("DATABASE_KEY"),
+        _ => "",
+    };
+    res.to_string()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let app = tauri::Builder::default().plugin(tauri_plugin_autostart::init(
-        MacosLauncher::LaunchAgent,
-        None,
-    ));
-    let _ = dotenv().expect("Failed to load .env file");
-    let db_key = env::var("DATABASE_KEY").expect("DATABASE_KEY not found");
+    let app = tauri::Builder::default();
+
+    // let _ = dotenv();
+    let db_key = dotenv!("DATABASE_KEY");
 
     app
         // .plugin(tauri_plugin_prevent_default::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            None,
+        ))
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(
             tauri_plugin_keygen::Builder::new(
-                env::var("KEYGEN_ACCOUNT_ID").unwrap(),
-                env::var("KEYGEN_VERIFY_KEY").unwrap(),
+                dotenv!("KEYGEN_ACCOUNT_ID"),
+                dotenv!("KEYGEN_VERIFY_KEY"),
                 "test-encryption.db",
+                db_key,
             )
             .build(),
         )
@@ -65,6 +83,7 @@ pub fn run() {
             download_binary_file,
             cancel_download,
             show_container_window,
+            get_env
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

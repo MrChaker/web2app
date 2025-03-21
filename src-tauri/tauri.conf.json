@@ -1,15 +1,14 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "web-to-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "identifier": "com.web-to-app.app",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
   },
-
   "app": {
     "withGlobalTauri": true,
     "windows": [
@@ -19,7 +18,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://example.com;",
+      "csp": "default-src 'self'; connect-src 'self' https://api.keygen.sh;",
       "capabilities": ["appbar", "default"]
     }
   },
@@ -39,9 +38,10 @@
   "plugins": {
     "updater": {
       "createUpdaterArtifacts": true,
+      "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQyNTU1Nzk2RjBEMTg0REUKUldUZWhOSHdsbGRWMHJUeU9hWjhWNXg4QXQ0YUhpOCs3QTNsVjk3Z0hEczVvTDhZR0grMnNzVGMK",
       "endpoints": [
-        "https://github.com/MrChaker/upcount-updater/releases/latest/download/latest.json"
+        "https://api.keygen.sh/v1/accounts/bd4b05a9-b8eb-4a87-8f7e-3d5c933cff3a/engines/tauri/5cf92b6e-5755-468b-86d2-83233a275530?platform={{target}}&arch={{arch}}&version={{current_version}}&channel=stable"
       ],
       "windows": {
         "installMode": "basicUi"

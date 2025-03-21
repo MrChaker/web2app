@@ -38,8 +38,9 @@ impl LicensedState {
         client: &KeygenClient,
         machine: &Machine,
         db_name: &str,
+        db_key: &str,
     ) -> Result<Self> {
-        if let Some(key) = Self::get_cached_license_key(app, db_name).await? {
+        if let Some(key) = Self::get_cached_license_key(app, db_name, db_key).await? {
             // load from machine file
             match machine.load_machine_file(&key, client, app) {
                 Ok(Some(machine_license)) => match License::from_machine_license(machine_license) {
@@ -182,11 +183,10 @@ impl LicensedState {
     pub(crate) async fn get_cached_license_key<R: Runtime>(
         app: &AppHandle<R>,
         db_name: &str,
+        db_key: &str,
     ) -> Result<Option<String>> {
-        let db_key = env::var("DATABASE_KEY").expect("Failed to get db key");
-
         let db_path = app.path().app_config_dir().unwrap();
-
+        let db_key = db_key.to_string();
         let database_url = format!("{}/{}", db_path.display(), db_name);
 
         let opts = SqliteConnectOptions::new()
