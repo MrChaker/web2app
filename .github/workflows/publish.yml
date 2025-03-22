@@ -76,8 +76,14 @@ jobs:
           DATABASE_KEY=${{ env.DATABASE_KEY }} \n
           KEYGEN_ACCOUNT_ID=${{ env.KEYGEN_ACCOUNT_ID }} \n
           KEYGEN_VERIFY_KEY=${{ env.KEYGEN_VERIFY_KEY }} \n
-          HEARTBEAT_INTERVAL=${{ env.HEARTBEAT_INTERVAL }}
+          HEARTBEAT_INTERVAL=${{ env.HEARTBEAT_INTERVAL }} \n
           " > .env
+
+      - name: Obfustication
+        env:
+          CRYPTIFY_KEY: ${{ secrets.CRYPTIFY_KEY }}
+        run: |
+          "./rust-obfuscator ./src-tauri/src"
 
       - uses: tauri-apps/tauri-action@v0
         env:

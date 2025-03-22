@@ -33,6 +33,7 @@ tauri-plugin-dialog = "2"
 tauri-plugin-process = "2"
 fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
 dotenvy_macro = "0.15.7"
+cryptify = "3.1.1"
 
 [dependencies.tauri-plugin-sql]
 features = ["bundled-sqlcipher"]

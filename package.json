@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && npx npx javascript-obfuscator dist --output dist",
+    "build": "tsc && vite build && npx javascript-obfuscator dist --output dist",
     "preview": "vite preview",
     "tauri": "tauri",
     "postinstall": "node install.cjs"

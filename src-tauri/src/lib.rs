@@ -7,7 +7,7 @@ use crate::invoke::{
     cancel_download::cancel_download, download_binary_file::download_binary_file,
     download_file::download_file, show_container_window::show_container_window,
 };
-use dotenv::dotenv;
+use cryptify;
 use dotenvy_macro::dotenv;
 use migrations::get_migrations;
 use std::env;
