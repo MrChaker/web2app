@@ -27,11 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: debug
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          ls -a
-
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
@@ -88,7 +83,7 @@ jobs:
         env:
           CRYPTIFY_KEY: ${{ secrets.CRYPTIFY_KEY }}
         run: |
-          "./rust-obfuscator ./src-tauri/src"
+          ./rust-obfuscator ./src-tauri/src
 
       - uses: tauri-apps/tauri-action@v0
         env:
