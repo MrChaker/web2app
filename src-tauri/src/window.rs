@@ -1,10 +1,11 @@
 use crate::download_manager::download_service::DownloadService;
 use serde::{Deserialize, Serialize};
-use std::{env, path::PathBuf, str::FromStr};
+use std::{error::Error, path::PathBuf, str::FromStr};
 use tauri::{
-    process, webview::DownloadEvent, window::Color, App, LogicalPosition, LogicalSize, WebviewUrl,
-    WebviewWindow, WebviewWindowBuilder, Window,
+    http::Method, webview::DownloadEvent, App, LogicalPosition, LogicalSize, Url, WebviewUrl,
+    Window,
 };
+use tauri_plugin_http::reqwest::{ClientBuilder, Request};
 
 #[derive(Serialize, Deserialize, Clone)]
 struct AppConfig {
@@ -18,8 +19,6 @@ pub async fn build_window(app: &mut App) -> Window {
 
     let app_config: AppConfig = serde_json::from_str(include_str!("../../app-config.json"))
         .expect("Failed to parse app config");
-
-    let url = WebviewUrl::App(PathBuf::from_str(&app_config.url).unwrap());
 
     let user_agent = if cfg!(target_os = "macos") {
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15"
@@ -60,23 +59,76 @@ pub async fn build_window(app: &mut App) -> Window {
         .build()
         .expect("Failed to build window");
 
-    let _app_window = container_window.add_child(
-        tauri::webview::WebviewBuilder::new("app", url)
-            .user_agent(user_agent)
-            .initialization_script(config_script)
-            .initialization_script(include_str!("./scripts/helpers.js"))
-            .on_download(move |webveiw, ev| {
-                // let b = a.unmanage();
-                if let DownloadEvent::Requested { url, destination } = ev {
-                    let download_service = DownloadService::new(webveiw);
-                    download_service.on_download(url);
-                }
-                return false;
-            })
-            .auto_resize(),
-        LogicalPosition::new(0., app_bar_height - 1.2),
-        LogicalSize::new(width, height - app_bar_height),
-    );
+    let url = WebviewUrl::App(PathBuf::from_str(&app_config.url).unwrap());
+    let client = ClientBuilder::new().build().unwrap();
+    let response = client
+        .execute(Request::new(
+            Method::HEAD,
+            Url::from_str(&app_config.url).unwrap(),
+        ))
+        .await;
+
+    let _app_window = match response {
+        Err(e) => {
+            let error_page = WebviewUrl::App(PathBuf::from_str("./templates/error.html").unwrap());
+
+            let mut errors = vec![];
+            let mut source = e.source();
+            while let Some(s) = source {
+                errors.push(format!("{s}"));
+                source = s.source();
+            }
+
+            println!(
+                "Caused by: {}",
+                errors
+                    .iter()
+                    .map(|s| s.as_str())
+                    .collect::<Vec<&str>>()
+                    .join("-")
+            );
+
+            container_window.add_child(
+                tauri::webview::WebviewBuilder::new("app", error_page)
+                    .initialization_script(&format!(
+                        r#"
+                        window.error = "{}"
+                    "#,
+                        errors
+                            .iter()
+                            .map(|s| s.as_str())
+                            .collect::<Vec<&str>>()
+                            .join("-")
+                    ))
+                    .auto_resize(),
+                LogicalPosition::new(0., app_bar_height - 1.2),
+                LogicalSize::new(width, height - app_bar_height),
+            )
+        }
+        Ok(_) => {
+            container_window.add_child(
+                tauri::webview::WebviewBuilder::new("app", url)
+                    .user_agent(user_agent)
+                    .initialization_script(config_script)
+                    .initialization_script(include_str!("./scripts/helpers.js"))
+                    .on_download(move |webveiw, ev| {
+                        // let b = a.unmanage();
+                        if let DownloadEvent::Requested {
+                            url,
+                            destination: _,
+                        } = ev
+                        {
+                            let download_service = DownloadService::new(webveiw);
+                            download_service.on_download(url);
+                        }
+                        return false;
+                    })
+                    .auto_resize(),
+                LogicalPosition::new(0., app_bar_height - 1.2),
+                LogicalSize::new(width, height - app_bar_height),
+            )
+        }
+    };
 
     let _app_bar_window = container_window.add_child(
         tauri::webview::WebviewBuilder::new("app_bar", react_url.clone())
