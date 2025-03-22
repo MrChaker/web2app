@@ -26,14 +26,14 @@ export const setUpTray = async (
       id: "minimize",
       text: "Minimize",
       action: () => {
-        window.minimize();
+        window.hide();
       },
     });
     items.push({
       id: "show",
       text: "Show",
       action: () => {
-        window.maximize();
+        window.show();
       },
     });
   }
