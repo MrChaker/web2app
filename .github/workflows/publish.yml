@@ -86,7 +86,7 @@ jobs:
         env:
           CRYPTIFY_KEY: ${{ secrets.CRYPTIFY_KEY }}
         run: |
-          ./rust-obfuscator ./src-tauri/src
+          cd rust-obfuscator && cargo run ./src-tauri
 
       - uses: tauri-apps/tauri-action@v0
         env:
