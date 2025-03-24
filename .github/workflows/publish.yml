@@ -72,12 +72,10 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "
-          DATABASE_KEY=${{ env.DATABASE_KEY }} \n
-          KEYGEN_ACCOUNT_ID=${{ env.KEYGEN_ACCOUNT_ID }} \n
-          KEYGEN_VERIFY_KEY=${{ env.KEYGEN_VERIFY_KEY }} \n
-          HEARTBEAT_INTERVAL=${{ env.HEARTBEAT_INTERVAL }} \n
-          " > .env
+          echo "DATABASE_KEY=${{ env.DATABASE_KEY }}" > .env
+          echo "KEYGEN_ACCOUNT_ID=${{ env.KEYGEN_ACCOUNT_ID }}" >> .env
+          echo "KEYGEN_VERIFY_KEY=${{ env.KEYGEN_VERIFY_KEY }}" >> .env
+          echo "HEARTBEAT_INTERVAL=${{ env.HEARTBEAT_INTERVAL }}" >> .env
 
       - name: verify .env file
         run: cat .env
