@@ -79,6 +79,9 @@ jobs:
           HEARTBEAT_INTERVAL=${{ env.HEARTBEAT_INTERVAL }} \n
           " > .env
 
+      - name: verify .env file
+        run: cat .env
+
       - name: Obfustication
         env:
           CRYPTIFY_KEY: ${{ secrets.CRYPTIFY_KEY }}
