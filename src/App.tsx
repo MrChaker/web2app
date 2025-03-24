@@ -181,6 +181,7 @@ function App() {
       <AppBar
         setDownloadsOpen={setDownloadsOpen}
         setSettingsOpen={setSettingsOpen}
+        db={db}
       />
     );
   }

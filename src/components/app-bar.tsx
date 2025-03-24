@@ -6,16 +6,21 @@ import {
   SettingsIcon,
   X,
 } from "lucide-react";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { getAllWindows, getCurrentWindow } from "@tauri-apps/api/window";
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { getSettings, Option, Setting } from "./settings";
+import { Database } from "../global";
+import { TrayIcon } from "@tauri-apps/api/tray";
 
 const AppBar = ({
   setDownloadsOpen,
   setSettingsOpen,
+  db,
 }: {
   setDownloadsOpen: Dispatch<SetStateAction<boolean>>;
   setSettingsOpen: Dispatch<SetStateAction<boolean>>;
+  db: Database | null;
 }) => {
   const appWindow = getCurrentWindow();
   const barHeight = 38;
@@ -39,6 +44,34 @@ const AppBar = ({
       }
     });
   }, []);
+
+  const minimize = async () => {
+    const res: Setting[] = await getSettings(db!);
+
+    const minimizeTr = Boolean(
+      res.find((row) => row.option === Option.MINIMIZE_TRAY)?.value == "true"
+    );
+    if (minimizeTr) {
+      appWindow.hide();
+      return;
+    }
+    await appWindow.setFullscreen(false);
+    appWindow.minimize();
+  };
+
+  const close = async () => {
+    const res: Setting[] = await getSettings(db!);
+    const closeTr = Boolean(
+      res.find((row) => row.option === Option.CLOSE_TRAY)?.value == "true"
+    );
+
+    if (closeTr) {
+      appWindow.hide();
+      return;
+    }
+    const all = await getAllWindows();
+    all.forEach((window) => window.destroy());
+  };
 
   return (
     <div
@@ -76,11 +109,7 @@ const AppBar = ({
           </div>
         </div>
         <div className="window-controls">
-          <button
-            onClick={async () => {
-              await appWindow.setFullscreen(false);
-              appWindow.minimize();
-            }}>
+          <button onClick={minimize}>
             <Minus />
           </button>
           <button
@@ -91,7 +120,7 @@ const AppBar = ({
             {isMaximized ? <Minimize /> : <Maximize />}
           </button>
 
-          <button onClick={() => appWindow.close()}>
+          <button onClick={close}>
             <X />
           </button>
         </div>

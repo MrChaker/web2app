@@ -62,19 +62,22 @@ const Settings = ({
   );
 };
 
-enum Option {
+export enum Option {
   AUTO_START = "auto_start",
   CLOSE_TRAY = "close_tray",
   MINIMIZE_TRAY = "minimize_tray",
 }
 
-type Setting = {
+export type Setting = {
   option: Option;
   value: string;
 };
 
+export const getSettings = async (db: Database) => {
+  return await db.select("SELECT * FROM settings");
+};
+
 const SystemSettings = ({ db }: { db: Database | null }) => {
-  const [trayIcon, setTrayIcon] = useState<TrayIcon | null>(null);
   const [autoStart, setAutoStart] = useState(true);
   const [minizeSystemTray, setMinizeSystemTray] = useState(false);
   const [closeSystemTray, setCloseSystemTray] = useState(false);
@@ -82,7 +85,7 @@ const SystemSettings = ({ db }: { db: Database | null }) => {
 
   const autoStartDefault = async (db: Database) => {
     // if there's no data in auto_start ( first time using app ) . autostart should be enabled
-    const res: Setting[] = await db.select("SELECT * FROM settings");
+    const res: Setting[] = await getSettings(db);
     const autoStart = Boolean(
       res.find((row) => row.option === Option.AUTO_START)?.value == "true"
     );
@@ -97,13 +100,7 @@ const SystemSettings = ({ db }: { db: Database | null }) => {
     setCloseSystemTray(closeTr);
     setMinizeSystemTray(minimizeTr);
 
-    setTrayIcon(
-      (await setUpTray(
-        closeTr,
-        minimizeTr,
-        await TrayIcon.getById("tray") // pass existing to not create new one
-      )) || null
-    );
+    await setUpTray();
   };
 
   useEffect(() => {
@@ -148,7 +145,6 @@ const SystemSettings = ({ db }: { db: Database | null }) => {
             onChange={async (e) => {
               updateOption(Option.MINIMIZE_TRAY, e.target.checked);
               setMinizeSystemTray(e.target.checked);
-              setUpTray(closeSystemTray, e.target.checked, trayIcon);
             }}
           />
           Minimize In System Tray
@@ -161,7 +157,6 @@ const SystemSettings = ({ db }: { db: Database | null }) => {
             onChange={async (e) => {
               updateOption(Option.CLOSE_TRAY, e.target.checked);
               setCloseSystemTray(e.target.checked);
-              setUpTray(e.target.checked, minizeSystemTray, trayIcon);
             }}
           />
           Close In System Tray
