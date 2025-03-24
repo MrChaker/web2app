@@ -42,8 +42,9 @@ export const setUpTray = async (
     trayIcon.setMenu(await Menu.new({ items }));
     return trayIcon;
   }
+
   return await TrayIcon.new({
-    id: "app-tray",
+    id: "tray",
     menu: await Menu.new({ items }),
     icon: (await defaultWindowIcon()) || undefined,
   });

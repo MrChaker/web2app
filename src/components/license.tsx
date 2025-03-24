@@ -104,7 +104,7 @@ export const getLicenseKey = async (db: Database): Promise<string> => {
 };
 
 const putLicenseKey = async (db: Database, key: string): Promise<void> => {
-  await db.execute("DELETE FROM license_key WHERE id = 1");
+  await db.execute("DELETE FROM license_key");
   await db.execute("INSERT INTO license_key (key) VALUES ($1)", [key]);
 };
 

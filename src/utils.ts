@@ -141,14 +141,15 @@ export const showLicenseFrom = async (db: Database | null) => {
   const mainWindow = allWindows.find((w) => w.label == "main");
   const appWindow = allWindows.find((w) => w.label == "container");
 
-  const trayIcon = await TrayIcon.getById("app-tray");
+  const trayIcon = await TrayIcon.getById("tray");
   trayIcon?.setVisible(false);
+
   mainWindow?.show();
   appWindow?.hide();
 };
 
 const deleteLicenseKey = async (db: Database | null): Promise<void> => {
-  if (db) await db.execute("DELETE FROM license_key WHERE id = 1");
+  if (db) await db.execute("DELETE FROM license_key");
 };
 
 export const onMacOnWindows = (mac: any, windows: any) => {

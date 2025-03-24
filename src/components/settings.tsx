@@ -101,7 +101,7 @@ const SystemSettings = ({ db }: { db: Database | null }) => {
       (await setUpTray(
         closeTr,
         minimizeTr,
-        await TrayIcon.getById("app-tray") // pass existing to not create new one
+        await TrayIcon.getById("tray") // pass existing to not create new one
       )) || null
     );
   };
@@ -110,7 +110,7 @@ const SystemSettings = ({ db }: { db: Database | null }) => {
     if (db) {
       autoStartDefault(db);
       webview.listen("licensed", async () => {
-        (await TrayIcon.getById("app-tray"))?.setVisible(true);
+        (await TrayIcon.getById("tray"))?.setVisible(true);
       });
     }
   }, [db]);
