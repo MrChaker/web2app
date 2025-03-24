@@ -23,14 +23,27 @@ import { invoke } from "@tauri-apps/api/core";
 
 function App() {
   const webview = getCurrentWebview();
-
-  const sql: Database = (window as any).__TAURI__.sql;
+  if (webview.label == "error") {
+    // url site error
+    return (
+      <div style={{ padding: "10rem" }}>
+        <h1>Could not load page</h1>
+        <h5 id="error">
+          {(window as any).error.split("-").map((message: string) => (
+            <li>{message}</li>
+          ))}
+        </h5>
+      </div>
+    );
+  }
 
   const appWindow = getCurrentWindow();
-  const [db, setDb] = useState<Database | null>(null);
+  const sql: Database = (window as any).__TAURI__.sql;
 
+  const [db, setDb] = useState<Database | null>(null);
   const [downloadsOpen, setDownloadsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [updaterTimeout, setUpdaterTimeout] = useState<number | null>(null);
 
   const getWebview = async (label: string) => {
     const webviews = await getAllWebviews();
@@ -73,6 +86,7 @@ function App() {
           machineId
         ).then(async () => {
           showLicenseFrom(db);
+          if (updaterTimeout) clearTimeout(updaterTimeout);
         });
       }
     }
@@ -119,12 +133,14 @@ function App() {
       });
     }
 
-    setTimeout(async () => {
-      if (!(await appWindow.isVisible())) return;
-      if (webview.label !== "main" && webview.label !== "app_bar") return;
-      // run only on opened window . if container is opened run only on app_bar
-      updater();
-    }, 2000);
+    setUpdaterTimeout(
+      setTimeout(async () => {
+        if (!(await appWindow.isVisible())) return;
+        if (webview.label !== "main" && webview.label !== "app_bar") return;
+        // run only on opened window . if container is opened run only on app_bar
+        updater();
+      }, 2000)
+    );
 
     const unlisteners = [
       webview.listen("download_toggled", (event) => {

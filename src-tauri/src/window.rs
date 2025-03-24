@@ -70,8 +70,6 @@ pub async fn build_window(app: &mut App) -> Window {
 
     let _app_window = match response {
         Err(e) => {
-            let error_page = WebviewUrl::App(PathBuf::from_str("./templates/error.html").unwrap());
-
             let mut errors = vec![];
             let mut source = e.source();
             while let Some(s) = source {
@@ -89,7 +87,7 @@ pub async fn build_window(app: &mut App) -> Window {
             );
 
             container_window.add_child(
-                tauri::webview::WebviewBuilder::new("app", error_page)
+                tauri::webview::WebviewBuilder::new("error", react_url.clone())
                     .initialization_script(&format!(
                         r#"
                         window.error = "{}"
