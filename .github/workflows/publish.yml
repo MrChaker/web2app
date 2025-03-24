@@ -73,10 +73,10 @@ jobs:
       - name: Create .env file
         run: |
           echo "
-          DATABASE_KEY=${{ secrets.DATABASE_KEY }} \n
-          KEYGEN_ACCOUNT_ID=${{ secrets.KEYGEN_ACCOUNT_ID }} \n
-          KEYGEN_VERIFY_KEY=${{ secrets.KEYGEN_VERIFY_KEY }} \n
-          HEARTBEAT_INTERVAL=${{ secrets.HEARTBEAT_INTERVAL }} \n
+          DATABASE_KEY=${{ secrets.DATABASE_KEY }}
+          KEYGEN_ACCOUNT_ID=${{ secrets.KEYGEN_ACCOUNT_ID }}
+          KEYGEN_VERIFY_KEY=${{ secrets.KEYGEN_VERIFY_KEY }}
+          HEARTBEAT_INTERVAL=${{ secrets.HEARTBEAT_INTERVAL }}
           " > .env
 
       - name: verify .env file
