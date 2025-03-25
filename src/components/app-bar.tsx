@@ -7,11 +7,9 @@ import {
   X,
 } from "lucide-react";
 import { getAllWindows, getCurrentWindow } from "@tauri-apps/api/window";
-
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { getSettings, Option, Setting } from "./settings";
 import { Database } from "../global";
-import { TrayIcon } from "@tauri-apps/api/tray";
 
 const AppBar = ({
   setDownloadsOpen,
